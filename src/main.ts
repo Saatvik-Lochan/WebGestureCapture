@@ -65,7 +65,7 @@ function animate() {
     renderer.setAnimationLoop(function () {
       if (capturingHandData) 
         allHandData.push(getHandDataAsString(renderer, clock));
-        
+
       renderer.render(scene, camera);
     });
-  }
+}
