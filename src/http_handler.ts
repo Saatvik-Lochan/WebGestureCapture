@@ -1,4 +1,4 @@
-const backend_url = "https://09e472cad4feff.lhr.life";
+const backend_url = "https://3f07f95fd1dda8.lhr.life";
 
 async function sendData(data: object, route = "") {
     await fetch(`${backend_url}/${route}`, {

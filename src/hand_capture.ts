@@ -71,7 +71,7 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[0];
 
-	return capturedData;
+	return capturedData.join("");
 }
 
 export { captureHandSequence };
