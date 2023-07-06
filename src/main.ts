@@ -3,6 +3,8 @@ import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { loadFont, countDown, Style } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
+import { sendData } from "./http_handler";
+import { playBeep } from "./audio";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -24,7 +26,7 @@ main();
 function main() {
     init();
     animate();
-    display();
+    renderer.xr.addEventListener('sessionstart', display);
 }
 
 function init() {
@@ -79,9 +81,9 @@ function animate() {
 
 function display() {
     loadFont()
-        .then((_) => countDown(5, scene, new Style()))
-        .then((_) => captureHandSequence(5000, renderer))
-        .then((handData) => console.log(handData));
+        .then((_) => countDown(3, scene, new Style()))
+        .then((_) => Promise.all([captureHandSequence(5000, renderer), playBeep(audio)]))
+        .then((handData) => Promise.all([sendData({"result": handData}, ""), playBeep(audio)]));
 }
 
 export {frameListeners};

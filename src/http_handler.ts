@@ -1,7 +1,7 @@
-const backend_url = ""
+const backend_url = "https://09e472cad4feff.lhr.life";
 
-function sendData(data: object, route = "") {
-    fetch(`${backend_url}/${route}`, {
+async function sendData(data: object, route = "") {
+    await fetch(`${backend_url}/${route}`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -10,3 +10,5 @@ function sendData(data: object, route = "") {
         }
     })
 }
+
+export { sendData }
