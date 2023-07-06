@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.js";
-import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { loadFont, displayTextSequence, countDown, Style } from "./text_display";
+import { loadFont, countDown, Style } from "./text_display";
+import { captureHandSequence } from "./hand_capture";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -18,6 +18,14 @@ let capturingHandData = false;
 
 // container variables
 let allHandData = [];
+
+main();
+
+function main() {
+    init();
+    animate();
+    display();
+}
 
 function init() {
     initRenderer();
@@ -71,7 +79,9 @@ function animate() {
 
 function display() {
     loadFont()
-        .then((_) => {countDown(5, scene, new Style())})
+        .then((_) => countDown(5, scene, new Style()))
+        .then((_) => captureHandSequence(5000, renderer))
+        .then((handData) => console.log(handData));
 }
 
 export {frameListeners};
