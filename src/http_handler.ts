@@ -1,5 +1,15 @@
-const backend_url = "https://3f07f95fd1dda8.lhr.life";
+const backend_url = "https://b3a6414c15608f.lhr.life";
 
+// formatters
+function formatHandData(handData: any, title: string) {
+    return {
+        title: title,
+        data: handData
+    }
+}
+
+
+// handles sending the data with a POST request
 async function sendData(data: object, route = "") {
     await fetch(`${backend_url}/${route}`, {
         method: "POST",

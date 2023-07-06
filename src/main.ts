@@ -26,7 +26,7 @@ main();
 function main() {
     init();
     animate();
-    renderer.xr.addEventListener('sessionstart', display);
+    renderer.xr.addEventListener('sessionstart', vrSequence);
 }
 
 function init() {
@@ -79,11 +79,17 @@ function animate() {
     });
 }
 
-function display() {
+function vrSequence() {
     Promise.all([loadFont(), loadBeep()]) // load font and beep
         .then((_) => countDown(3, scene, new Style())) // countdown
-        .then((_) => Promise.all([captureHandSequence(5000, renderer), playBeep(audio)])) // play beep and start recording
-        .then((handData) => Promise.all([sendData({"result": handData}, ""), playBeep(audio)])); // play beep and send data
+        .then((_) => 
+            Promise.all(
+                [captureHandSequence(3000, renderer), 
+                 playBeep(audio)])) // play beep and start recording
+        .then((handData) => 
+            Promise.all(
+                [sendData({"result": handData}, "gestures"), 
+                 playBeep(audio)])); // play beep and send data
 }
 
-export {frameListeners};
+export { frameListeners };
