@@ -32,6 +32,11 @@ type TextInstance = {
 
 type TextSequence = TextInstance[];
 
+// useful shortcuts
+function displayString(str: string, duration: number, scene: Scene) {
+    displayTextSequence([{textGroup: [{text: str, style: new Style()}], duration: duration}], scene);
+}
+
 // promise definitions
 function loadFont() {
     const fontLoader = new FontLoader();
@@ -112,4 +117,4 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     return textGroup.map((text) => loadText(text, font, scene));
 }
 
-export {loadFont, displayTextSequence, countDown, Style};
+export { loadFont, displayTextSequence, countDown, Style, displayString };

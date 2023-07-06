@@ -1,4 +1,4 @@
-const backend_url = "https://b3a6414c15608f.lhr.life";
+const backend_url = "https://b2d66f4534ad75.lhr.life";
 
 // formatters
 function formatHandData(handData: any, title: string) {

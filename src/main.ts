@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.js";
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { loadFont, countDown, Style } from "./text_display";
+import { loadFont, countDown, Style, displayString } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
 import { sendData } from "./http_handler";
 import { loadBeep, playBeep } from "./audio";
@@ -9,11 +9,11 @@ import { loadBeep, playBeep } from "./audio";
 // main resources
 let renderer: THREE.WebGLRenderer;
 let camera: THREE.PerspectiveCamera;
-let scene: THREE.Scene; 
+let scene: THREE.Scene;
 let audio: THREE.Audio;
 let clock: THREE.Clock;
-let hands: THREE.XRHandSpace[]; 
-let frameListeners: {[key: string]: () => any} = {};
+let hands: THREE.XRHandSpace[];
+let frameListeners: { [key: string]: () => any } = {};
 
 // state variables
 let capturingHandData = false;
@@ -58,38 +58,39 @@ function init() {
 
     function initHands() {
         const handModelFactory = new XRHandModelFactory();
-        
+
         function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
             const outHand = renderer.xr.getHand(index);
             scene.add(outHand);
-            
+
             const handModel = handModelFactory.createHandModel(outHand, type);
             outHand.add(handModel);
             return outHand;
         }
 
-        hands = [0, 1].map((ele) => initHand(ele, "mesh"));
-    }   
+        hands = [0, 1].map((ele) => initHand(ele, "spheres"));
+    }
 }
 
 function animate() {
     renderer.setAnimationLoop(() => {
-      Object.values(frameListeners).forEach((fcn: () => any) => (fcn()));
-      renderer.render(scene, camera);
+        Object.values(frameListeners).forEach((fcn: () => any) => (fcn()));
+        renderer.render(scene, camera);
     });
 }
 
 function vrSequence() {
     Promise.all([loadFont(), loadBeep()]) // load font and beep
         .then((_) => countDown(3, scene, new Style())) // countdown
-        .then((_) => 
+        .then((_) =>
             Promise.all(
-                [captureHandSequence(3000, renderer), 
+                [displayString("Perform your gesture", 3000, scene),
+                 captureHandSequence(3000, renderer),
                  playBeep(audio)])) // play beep and start recording
-        .then((handData) => 
+        .then((handData) =>
             Promise.all(
-                [sendData({"result": handData}, "gestures"), 
-                 playBeep(audio)])); // play beep and send data
+                [sendData({ "result": handData }, "gestures"),
+                playBeep(audio)])); // play beep and send data
 }
 
 export { frameListeners };
