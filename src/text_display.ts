@@ -5,30 +5,24 @@ let loadedFont: Font;
 
 
 // object type definitions
-class TextObject {
+type FontObject = {
+    size: number;
+    xpos: number;
+    ypos: number;
+}
+
+type TextObject = {
     text: string;
     size: number;
     xpos: number;
     ypos: number;
-
-    constructor(text: string, size = 1, xpos = 0, ypos = 0) {
-      this.text = text;
-      this.size = size;
-      this.xpos = xpos;
-      this.ypos = ypos;
-    }
 }
 
 type TextGroup = TextObject[];
 
-class TextInstance {
+type TextInstance = {
     textGroup: TextGroup;
     duration: number;
-  
-    constructor(textRepr: TextGroup, duration: number) {
-      this.textGroup = textRepr;
-      this.duration = duration;
-    }
 }
 
 type TempSequence = TextInstance[];
