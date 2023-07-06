@@ -3,17 +3,24 @@ import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 // object type definitions
+let font: Font;
 
 // conceptual text objects
-type StyleObject = {
+class Style {
     size: number;
     xpos: number;
     ypos: number;
+
+    constructor (size = 1, xpos = 0, ypos = 0) {
+        this.size = size;
+        this.xpos = xpos;
+        this.ypos = ypos;
+    }
 }
 
 type Text = {
     text: string;
-    style: StyleObject;
+    style: Style;
 }
 
 type TextGroup = Text[];
@@ -31,17 +38,18 @@ function loadFont() {
     const currentFont = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
 
     return new Promise((resolve) => {
-        fontLoader.load(currentFont, (font) => {
+        fontLoader.load(currentFont, (loadedFont) => {
+            font = loadedFont;
             resolve(font);
         });
     });
 }
 
-async function displayTextSequence(textSequence: TextSequence, font: Font, scene: Scene) {
+async function displayTextSequence(textSequence: TextSequence, scene: Scene) {
     let currentTextGroup = [];
     function updateTextTo(textGroup: TextGroup) {
         clearTextGroup(currentTextGroup, scene);
-        currentTextGroup = loadTextGroup(textGroup, font, scene);
+        currentTextGroup = loadTextGroup(textGroup, scene);
     }
 
     for (let textInstance of textSequence) {
@@ -56,16 +64,15 @@ async function displayTextSequence(textSequence: TextSequence, font: Font, scene
 
 async function countDown(
     countFrom: number, 
-    font: Font,
     scene: Scene,
-    style: StyleObject={size: 1.5, xpos: 0, ypos: 0}) {
+    style: Style={size: 1.5, xpos: 0, ypos: 0}) {
 
     const textSequence = Array.from({ length: countFrom }, (_, i) => {
         let num = countFrom - i;
         return {textGroup: [{text: num.toString(), style: style}], duration: 1000};
     });
 
-    await displayTextSequence(textSequence, font, scene);
+    await displayTextSequence(textSequence, scene);
 }
 
 // utility function
@@ -75,7 +82,7 @@ function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
     }
 }
 
-function loadTextGroup(textGroup: TextGroup, font: Font, scene: Scene): Object3D[] {
+function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     function loadText(text: Text, font: Font, scene: Scene): Object3D {
         var geometry = new TextGeometry(text.text, {
             font: font,
@@ -104,3 +111,5 @@ function loadTextGroup(textGroup: TextGroup, font: Font, scene: Scene): Object3D
 
     return textGroup.map((text) => loadText(text, font, scene));
 }
+
+export {loadFont, displayTextSequence, countDown, Style};
