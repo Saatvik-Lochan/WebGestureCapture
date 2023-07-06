@@ -4,7 +4,7 @@ import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { loadFont, countDown, Style } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
 import { sendData } from "./http_handler";
-import { playBeep } from "./audio";
+import { loadBeep, playBeep } from "./audio";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -80,10 +80,10 @@ function animate() {
 }
 
 function display() {
-    loadFont()
-        .then((_) => countDown(3, scene, new Style()))
-        .then((_) => Promise.all([captureHandSequence(5000, renderer), playBeep(audio)]))
-        .then((handData) => Promise.all([sendData({"result": handData}, ""), playBeep(audio)]));
+    Promise.all([loadFont(), loadBeep()]) // load font and beep
+        .then((_) => countDown(3, scene, new Style())) // countdown
+        .then((_) => Promise.all([captureHandSequence(5000, renderer), playBeep(audio)])) // play beep and start recording
+        .then((handData) => Promise.all([sendData({"result": handData}, ""), playBeep(audio)])); // play beep and send data
 }
 
 export {frameListeners};

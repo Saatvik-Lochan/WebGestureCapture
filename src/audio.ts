@@ -1,15 +1,22 @@
 import { Audio, AudioLoader } from "three";
 
-function playBeep(audio: Audio) {
+// beep buffer cache
+let loadedBeep: AudioBuffer;
+
+function loadBeep() {
 	return new Promise((resolve) => {
 		const audioLoader = new AudioLoader();
 		audioLoader.load('resources/audio/beep-01a.wav', (buffer) => {
-			audio.setBuffer(buffer);
-			audio.setVolume(0.5);
-			audio.play();
-			resolve(undefined);
+			loadedBeep = buffer;
+			resolve(loadedBeep);
 		});
 	});
 }
 
-export { playBeep };
+function playBeep(audio: Audio) {
+	audio.setBuffer(loadedBeep);
+	audio.setVolume(0.5);
+	audio.play();
+}
+
+export { loadBeep, playBeep };
