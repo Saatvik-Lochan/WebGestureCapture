@@ -13,7 +13,7 @@ type StyleObject = {
 
 type Text = {
     text: string;
-    style: StyleObject; 
+    style: StyleObject;
 }
 
 type TextGroup = Text[];
@@ -37,7 +37,7 @@ function loadFont() {
     });
 }
 
-async function displayTextSequence(textSequence: TextSequence, font:Font, scene: Scene) {
+async function displayTextSequence(textSequence: TextSequence, font: Font, scene: Scene) {
     let currentTextGroup = [];
     function updateTextTo(textGroup: TextGroup) {
         clearTextGroup(currentTextGroup, scene);
@@ -48,12 +48,25 @@ async function displayTextSequence(textSequence: TextSequence, font:Font, scene:
         let durationPromise = new Promise((resolve) => setTimeout(resolve, textInstance.duration));
         updateTextTo(textInstance.textGroup);
         await durationPromise;
-    } 
-    
+    }
+
     // remove final text
     clearTextGroup(currentTextGroup, scene);
 }
 
+async function countDown(
+    countFrom: number, 
+    font: Font,
+    scene: Scene,
+    style: StyleObject={size: 1.5, xpos: 0, ypos: 0}) {
+
+    const textSequence = Array.from({ length: countFrom }, (_, i) => {
+        let num = countFrom - i;
+        return {textGroup: [{text: num.toString(), style: style}], duration: 1000};
+    });
+
+    await displayTextSequence(textSequence, font, scene);
+}
 
 // utility function
 function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
@@ -62,9 +75,7 @@ function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
     }
 }
 
-
-
-function loadTextGroup(textGroup: TextGroup, font:Font, scene: Scene): Object3D[] {
+function loadTextGroup(textGroup: TextGroup, font: Font, scene: Scene): Object3D[] {
     function loadText(text: Text, font: Font, scene: Scene): Object3D {
         var geometry = new TextGeometry(text.text, {
             font: font,
@@ -75,20 +86,20 @@ function loadTextGroup(textGroup: TextGroup, font:Font, scene: Scene): Object3D[
             bevelThickness: 0.02,
             bevelSize: 0.05,
             bevelSegments: 3
-          });
-        
-          // position text
-          geometry.center();
-          geometry.translate(text.style.xpos, text.style.ypos, -10);
-    
-          // add material and mesh
-          var material = new MeshBasicMaterial({ color: 0xffffff });
-          var mesh = new Mesh(geometry, material);
-          mesh.name = 'text';
-    
-          // add to scene and return
-          scene.add(mesh);
-          return mesh;
+        });
+
+        // position text
+        geometry.center();
+        geometry.translate(text.style.xpos, text.style.ypos, -10);
+
+        // add material and mesh
+        var material = new MeshBasicMaterial({ color: 0xffffff });
+        var mesh = new Mesh(geometry, material);
+        mesh.name = 'text';
+
+        // add to scene and return
+        scene.add(mesh);
+        return mesh;
     }
 
     return textGroup.map((text) => loadText(text, font, scene));
