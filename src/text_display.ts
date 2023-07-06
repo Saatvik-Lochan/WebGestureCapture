@@ -33,16 +33,19 @@ type TextInstance = {
 type TextSequence = TextInstance[];
 
 // useful shortcuts
-function displayString(str: string, duration: number, scene: Scene) {
-    displayTextSequence([{textGroup: [{text: str, style: new Style()}], duration: duration}], scene);
+function displayString(str: string, duration: number, scene: Scene, 
+    style={size: 1, xpos: 0, ypos: 0}) {
+
+    displayTextSequence([{textGroup: [{text: str, style: style}], duration: duration}], scene);
 }
 
 // promise definitions
 function loadFont() {
-    const fontLoader = new FontLoader();
-    const currentFont = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
-
     return new Promise((resolve) => {
+        const fontLoader = new FontLoader();
+        const currentFont = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
+
+
         fontLoader.load(currentFont, (loadedFont) => {
             font = loadedFont;
             resolve(font);
