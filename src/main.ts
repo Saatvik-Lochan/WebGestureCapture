@@ -11,8 +11,7 @@ let renderer: THREE.WebGLRenderer;
 let camera: THREE.PerspectiveCamera;
 let scene: THREE.Scene;
 let audio: THREE.Audio;
-let clock: THREE.Clock;
-let hands: THREE.XRHandSpace[];
+let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
 
 // state variables
@@ -87,9 +86,9 @@ function vrSequence() {
                 [displayString("Perform your gesture", 3000, scene),
                  captureHandSequence(3000, renderer),
                  playBeep(audio)])) // play beep and start recording
-        .then((handData) =>
+        .then((promiseResults) =>
             Promise.all(
-                [sendData({ "result": handData }, "gestures"),
+                [sendData({ "result": promiseResults[1] }, "gestures"),
                 playBeep(audio)])); // play beep and send data
 }
 
