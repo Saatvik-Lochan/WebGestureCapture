@@ -3,4 +3,4 @@
         "moduleResolution": "node",
         "target": "es2017"
     }
-  }
+}

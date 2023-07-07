@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@types/three": "^0.152.1",
     "dotenv": "^16.3.1",
