@@ -78,6 +78,7 @@ function animate() {
     });
 }
 
+
 function vrSequence() {
     Promise.all([loadFont(), loadBeep()]) // load font and beep
         .then((_) => countDown(3, scene, new Style())) // countdown
