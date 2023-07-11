@@ -13,6 +13,8 @@ let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
+let project: string;
+let participant: string;
 
 // state variables
 let capturingHandData = false;
@@ -33,6 +35,7 @@ function init() {
     initCameraAndScene();
     initAudio();
     initHands();
+    initProject();
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -69,6 +72,15 @@ function init() {
 
         hands = [0, 1].map((ele) => initHand(ele, "spheres"));
     }
+
+    function initProject() {
+        const urlParams = new URLSearchParams(window.location.search);
+        project = urlParams.get('project');
+        participant = urlParams.get('participant');
+
+        if (!(project && participant)) 
+            window.alert("Your data is not being recorded. Project and participant not set")
+    }
 }
 
 function animate() {
@@ -92,4 +104,4 @@ function vrSequence() {
                 playBeep(audio)])); // play beep and send data
 }
 
-export { frameListeners };
+export { frameListeners, project, participant };

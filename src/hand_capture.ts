@@ -78,13 +78,20 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 	const clock = new Clock(true);
 	const capturedData = [];
 	
-	frameListeners[0] = 
-		() => capturedData.push(getHandDataAsString(renderer, clock));
+	const frameBatchSize = 1000;
+
+	frameListeners[1] = () => {
+		capturedData.push(getHandDataAsArray(renderer, clock));
+
+		if (capturedData.length >= frameBatchSize) {
+
+		}
+	}
+		
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
-	delete frameListeners[0];
+	delete frameListeners[1];
 
-	return capturedData.join("");
 }
 
 async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) {
@@ -98,7 +105,7 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[0];
 
-	return capturedData.join("");
+	return capturedData.join("\n");
 }
 
 export { captureHandSequence };
