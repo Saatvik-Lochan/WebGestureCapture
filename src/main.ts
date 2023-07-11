@@ -15,6 +15,8 @@ let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
 let project: string;
 let participant: string;
+let trial: string;
+let gesture: string;
 
 // state variables
 let capturingHandData = false;
@@ -104,4 +106,4 @@ function vrSequence() {
                 playBeep(audio)])); // play beep and send data
 }
 
-export { frameListeners, project, participant };
+export { frameListeners, project, participant, trial, gesture };

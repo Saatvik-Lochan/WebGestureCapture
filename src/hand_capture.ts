@@ -1,5 +1,6 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./main";
+import { sendHandGestureBatch } from "./http_handler";
 
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	const arrayData = getHandDataAsArray(renderer, clock);
@@ -76,22 +77,34 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock) {
 
 async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 	const clock = new Clock(true);
-	const capturedData = [];
-	
+	let capturedData = [];
+
+	// Keep this large, as there is no provision for if one request reaches
+	// before another one. 1000 frames is around 15 seconds
 	const frameBatchSize = 1000;
+	let lastPromise = Promise.resolve();
 
 	frameListeners[1] = () => {
 		capturedData.push(getHandDataAsArray(renderer, clock));
 
 		if (capturedData.length >= frameBatchSize) {
+			// send data captured so far
+			// promise part might be useless (come back to it)
+			lastPromise = lastPromise.then((_) => convertAndSendCapturedData());
 
+			// reset capturedData
+			capturedData = [];
 		}
 	}
 		
-
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[1];
+	convertAndSendCapturedData; // send any yet unsent data
 
+	async function convertAndSendCapturedData() {
+		const capturedAsFloatArray = new Float32Array(capturedData);
+		await sendHandGestureBatch(capturedAsFloatArray.buffer);
+	}
 }
 
 async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) {

@@ -1,3 +1,4 @@
+import { project, participant, trial, gesture } from "./main";
 const backend_url = "http://185.164.136.22:3000/";
 
 // formatters
@@ -8,8 +9,12 @@ function formatHandData(handData: any, title: string) {
     }
 }
 
-async function sendHandGestureBatch(data) {
-
+async function sendHandGestureBatch(data: ArrayBuffer) {
+    return await fetch(
+        `${backend_url}/append-data/${project}/${participant}/${trial}/${gesture}`, {
+            method: "POST",
+            body: data,
+    });
 }
 
 // handles sending the data with a POST request
@@ -24,4 +29,4 @@ async function sendData(data: object, route = "") {
     })
 }
 
-export { sendData }
+export { sendData, sendHandGestureBatch }
