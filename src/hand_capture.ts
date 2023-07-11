@@ -83,6 +83,7 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 	// before another one. 1000 frames is around 15 seconds
 	const frameBatchSize = 1000;
 	let lastPromise = Promise.resolve();
+	let batchNumber = 0
 
 	frameListeners[1] = () => {
 		capturedData.push(getHandDataAsArray(renderer, clock));
@@ -90,7 +91,7 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 		if (capturedData.length >= frameBatchSize) {
 			// send data captured so far
 			// promise part might be useless (come back to it)
-			lastPromise = lastPromise.then((_) => convertAndSendCapturedData());
+			lastPromise = lastPromise.then((_) => convertAndSendCapturedData(batchNumber++));
 
 			// reset capturedData
 			capturedData = [];
@@ -101,9 +102,9 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 	delete frameListeners[1];
 	convertAndSendCapturedData; // send any yet unsent data
 
-	async function convertAndSendCapturedData() {
+	async function convertAndSendCapturedData(batchNumber: number) {
 		const capturedAsFloatArray = new Float32Array(capturedData);
-		await sendHandGestureBatch(capturedAsFloatArray.buffer);
+		await sendHandGestureBatch(capturedAsFloatArray.buffer, batchNumber);
 	}
 }
 

@@ -9,9 +9,9 @@ function formatHandData(handData: any, title: string) {
     }
 }
 
-async function sendHandGestureBatch(data: ArrayBuffer) {
+async function sendHandGestureBatch(data: ArrayBuffer, batchNumber: number) {
     return await fetch(
-        `${backend_url}/append-data/${project}/${participant}/${trial}/${gesture}`, {
+        `${backend_url}/append-data/${project}/${participant}/${trial}/${gesture}?batchNumber=${batchNumber}`, {
             method: "POST",
             body: data,
     });
