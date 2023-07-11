@@ -121,4 +121,4 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	return capturedData.join("\n");
 }
 
-export { captureHandSequence };
+export { captureHandSequence, streamHandCapture };
