@@ -11,7 +11,7 @@ function formatHandData(handData: any, title: string) {
 
 // handles sending the data with a POST request
 async function sendData(data: object, route = "") {
-    await fetch(`${backend_url}/${route}`, {
+    return await fetch(`${backend_url}/${route}`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
