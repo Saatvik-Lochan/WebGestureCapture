@@ -9,9 +9,17 @@ function formatHandData(handData: any, title: string) {
     }
 }
 
+async function closeHandGestureBatch() {
+    return await fetch(
+        `${backend_url}/data/close/${project}/${participant}/${trial}/${gesture}`, {
+            method: "POST",
+            body: null,
+    });
+}
+
 async function sendHandGestureBatch(data: ArrayBuffer, batchNumber: number) {
     return await fetch(
-        `${backend_url}/append-data/${project}/${participant}/${trial}/${gesture}?batchNumber=${batchNumber}`, {
+        `${backend_url}/data/append/${project}/${participant}/${trial}/${gesture}?batchNumber=${batchNumber}`, {
             method: "POST",
             body: data,
     });
@@ -29,4 +37,4 @@ async function sendData(data: object, route = "") {
     })
 }
 
-export { sendData, sendHandGestureBatch }
+export { sendData, sendHandGestureBatch, closeHandGestureBatch }

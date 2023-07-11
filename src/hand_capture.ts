@@ -1,6 +1,6 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./main";
-import { sendHandGestureBatch } from "./http_handler";
+import { closeHandGestureBatch, sendHandGestureBatch } from "./http_handler";
 
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	const arrayData = getHandDataAsArray(renderer, clock);
@@ -100,7 +100,8 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 		
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[1];
-	convertAndSendCapturedData; // send any yet unsent data
+	await convertAndSendCapturedData(batchNumber); // send any yet unsent data
+	closeHandGestureBatch(); // close the gesture for appends
 
 	async function convertAndSendCapturedData(batchNumber: number) {
 		const capturedAsFloatArray = new Float32Array(capturedData);
