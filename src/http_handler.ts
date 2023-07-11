@@ -26,9 +26,9 @@ async function sendHandGestureBatch(data: ArrayBuffer, batchNumber: number) {
 }
 
 // handles sending the data with a POST request
-async function sendData(data: object, route = "") {
+async function sendData(data: object, route = "", method="POST") {
     return await fetch(`${backend_url}/${route}`, {
-        method: "POST",
+        method,
         body: JSON.stringify(data),
         headers: {
             'Accept': 'application/json',

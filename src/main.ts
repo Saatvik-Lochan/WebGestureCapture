@@ -26,13 +26,13 @@ let allHandData = [];
 
 main();
 
-function main() {
-    init();
+async function main() {
+    await init();
     animate();
     renderer.xr.addEventListener('sessionstart', vrSequence);
 }
 
-function init() {
+async function init() {
     initRenderer();
     initCameraAndScene();
     initAudio();
@@ -75,13 +75,16 @@ function init() {
         hands = [0, 1].map((ele) => initHand(ele, "spheres"));
     }
 
-    function initProject() {
+    async function initProject() {
         const urlParams = new URLSearchParams(window.location.search);
         project = urlParams.get('project');
         participant = urlParams.get('participant');
 
         if (!(project && participant)) 
             window.alert("Your data is not being recorded. Project and participant not set")
+
+        const response = await sendData(null, `trial/${project}/${participant}`, "GET");
+        console.log(response.body);
     }
 }
 
