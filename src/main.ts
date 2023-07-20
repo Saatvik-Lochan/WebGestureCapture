@@ -3,7 +3,7 @@ import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { loadFont, countDown, Style, displayString } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
-import { sendData } from "./http_handler";
+import { sendData, sendHandGestureBatch } from "./http_handler";
 import { loadBeep, playBeep } from "./audio";
 import { sendFormData } from "./test";
 
@@ -14,10 +14,10 @@ let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
-let project: string;
-let participant: string;
-let trial: string;
-let gesture: string;
+let project: string = "test";
+let participant: string = "10-05929bdb7d";
+let trial: string = "1";
+let gesture: string = "0";
 
 // state variables
 let capturingHandData = false;
@@ -29,7 +29,14 @@ test();
 // main();
 
 async function test() {
-    await sendFormData();
+    await init();
+    animate();
+    renderer.xr.addEventListener('sessionstart', async () => {
+        const data = await captureHandSequence(2000, renderer);
+        const floatArray = new Float32Array(data);
+        const result = await sendHandGestureBatch(floatArray.buffer);
+        console.log(result);
+    });
 }
 
 async function main() {
@@ -43,7 +50,7 @@ async function init() {
     initCameraAndScene();
     initAudio();
     initHands();
-    initProject();
+    // initProject();
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });

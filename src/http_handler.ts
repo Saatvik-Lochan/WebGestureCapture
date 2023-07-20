@@ -1,5 +1,5 @@
 import { project, participant, trial, gesture } from "./main";
-const backend_url = "http://185.164.136.22:3000/";
+const backend_url = "http://185.164.136.22:3000";
 
 // formatters
 function formatHandData(handData: any, title: string) {
@@ -17,12 +17,22 @@ async function closeHandGestureBatch() {
     });
 }
 
-async function sendHandGestureBatch(data: ArrayBuffer, batchNumber: number) {
+async function sendHandGestureBatch(data: ArrayBuffer) {
+    const formData = new FormData();
+    formData.append('project_name', project);
+    formData.append('participant_id', participant);
+    formData.append('trial_id', trial);
+    formData.append('gesture_index', gesture);
+    formData.append('data', new Blob([data]));
+
+    console.log(formData);
+
     return await fetch(
-        `${backend_url}/data/append/${project}/${participant}/${trial}/${gesture}?batchNumber=${batchNumber}`, {
-            method: "POST",
-            body: data,
-    });
+        `${backend_url}/gesture-data/append-data`, {
+            method: 'POST',
+            body: formData
+        }
+    );
 }
 
 // handles sending the data with a POST request

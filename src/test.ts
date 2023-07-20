@@ -9,12 +9,10 @@ async function sendFormData() {
     fd.append('json_data', JSON.stringify({a: 1, b: 2}))
     fd.append('data', new Blob([binary.buffer]))
 
-    fetch(`${backend_url}test/form-data`, {
+    return await fetch(`${backend_url}test/form-data`, {
         method: 'POST',
         body: fd
-    }).then(console.log)
-
-    console.log("I happened")
+    })
 }
 
 export { sendFormData }

@@ -9,7 +9,7 @@ function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	return stringData;
 }
 
-function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock) {
+function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
 	const hand0 = renderer.xr.getHand(0);
 	const hand1 = renderer.xr.getHand(1);
 
@@ -41,15 +41,6 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock) {
 		'pinky-finger-tip'
 	];
 
-	function getJointAsString(handObj: XRHandSpace, jointName: string) {
-		const posArray = handObj.joints[jointName].position.toArray();
-		const poseArray = posArray.concat(handObj.joints[jointName].quaternion.toArray());
-
-		poseArray.forEach((ele: number, index: number) => poseArray[index] = ele.toFixed(7));
-
-		return `${poseArray.join(',')},`;
-	}
-
 	function getJointAsArr(handObj: XRHandSpace, jointName: string) {
 		const poseArray = 
 			[...handObj.joints[jointName].position.toArray(),
@@ -74,6 +65,7 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock) {
 
 	return finalData;
 }
+
 
 async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 	const clock = new Clock(true);
@@ -105,22 +97,22 @@ async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
 
 	async function convertAndSendCapturedData(batchNumber: number) {
 		const capturedAsFloatArray = new Float32Array(capturedData);
-		await sendHandGestureBatch(capturedAsFloatArray.buffer, batchNumber);
+		await sendHandGestureBatch(capturedAsFloatArray.buffer);
 	}
 }
 
 async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) {
 	// setting as 0 for now
 	const clock = new Clock(true);
-	const capturedData = [];
+	const capturedData: number[][] = [];
 	
 	frameListeners[0] = 
-		() => capturedData.push(getHandDataAsString(renderer, clock));
+		() => capturedData.push(getHandDataAsArray(renderer, clock));
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[0];
 
-	return capturedData.join("\n");
+	return capturedData.flat();
 }
 
 export { captureHandSequence, streamHandCapture };
