@@ -37,4 +37,4 @@ async function sendData(data: object, route = "", method="POST") {
     })
 }
 
-export { sendData, sendHandGestureBatch, closeHandGestureBatch }
+export { sendData, sendHandGestureBatch, closeHandGestureBatch, backend_url}

@@ -5,6 +5,7 @@ import { loadFont, countDown, Style, displayString } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
 import { sendData } from "./http_handler";
 import { loadBeep, playBeep } from "./audio";
+import { sendFormData } from "./test";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -24,7 +25,12 @@ let capturingHandData = false;
 // container variables
 let allHandData = [];
 
-main();
+test();
+// main();
+
+async function test() {
+    await sendFormData();
+}
 
 async function main() {
     await init();
