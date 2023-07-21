@@ -1,5 +1,5 @@
 import { project, participant, trial, gesture } from "./main";
-const backend_url = "http://185.164.136.22:3000";
+const backend_url = "https://185.164.136.22:8000";
 
 // formatters
 function formatHandData(handData: any, title: string) {
