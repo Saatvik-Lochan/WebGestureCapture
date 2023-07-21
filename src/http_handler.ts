@@ -25,6 +25,14 @@ async function sendHandGestureBatch(data: ArrayBuffer) {
     formData.append('gesture_index', gesture);
     formData.append('data', new Blob([data]));
 
+    const jsonData = {
+        "project_name": project,
+        "participant_id": participant,
+        "trial_id": trial,
+        "gesture_index": gesture,
+        "data": data
+    }
+
     console.log(formData);
 
     return await fetch(

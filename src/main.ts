@@ -33,6 +33,7 @@ async function test() {
     animate();
     renderer.xr.addEventListener('sessionstart', async () => {
         const data = await captureHandSequence(2000, renderer);
+        console.log(data.slice(0, 100))
         const floatArray = new Float32Array(data);
         const result = await sendHandGestureBatch(floatArray.buffer);
         console.log(result);
