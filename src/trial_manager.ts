@@ -12,6 +12,9 @@ async function performTrial(
     participant_id: string) 
     {
     await Promise.all([loadFont(), loadBeep()]);
+    await displayForReadableTime(trialToPerform.instructions, scene,
+        new Style(0.5, 0, 0));
+
     for (let i = 0; i < trialToPerform.gestures.length; i++) {
         const gestureToPerform = trialToPerform.gestures[i];
         await performGesture(
@@ -48,6 +51,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
     ]);
 
     playBeep(audio);
+    console.log("I tried to beep");
     await new Promise(resolve => setTimeout(resolve, 1000));
 }
 
