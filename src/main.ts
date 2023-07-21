@@ -114,4 +114,4 @@ function vrSequence() {
                 playBeep(audio)])); // play beep and send data
 }
 
-export { frameListeners, project, participant };
+export { frameListeners, project, participant, audio };

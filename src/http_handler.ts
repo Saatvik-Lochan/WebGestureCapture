@@ -1,11 +1,27 @@
 const backend_url = "https://gesturelogger.com:8000";
 
-async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
+function getFormDataFrom(gestureLocator: GestureLocator) {
     const formData = new FormData();
     formData.append('project_name', gestureLocator.project_name);
     formData.append('participant_id', gestureLocator.participant_id);
     formData.append('trial_id', gestureLocator.trial_id);
-    formData.append('gesture_index', gestureLocator.gesture_index.toFixed(0));
+    formData.append('gesture_index', gestureLocator.gesture_index);
+    return formData
+}
+
+async function startHandGestureTransfer(gestureLocator: GestureLocator) {
+    const formData = getFormDataFrom(gestureLocator);
+
+    return await fetch(
+        `${backend_url}/gesture-data/start-transfer`, {
+            method: 'POST',
+            body: formData
+        }
+    );
+}
+
+async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
+    const formData = getFormDataFrom(gestureLocator);
     formData.append('data', new Blob([data]));
 
     console.log(formData);
@@ -30,4 +46,4 @@ async function sendData(data: object, route = "", method="POST") {
     })
 }
 
-export { sendData, sendHandGestureBatch, backend_url}
+export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer}

@@ -2,7 +2,7 @@ type GestureLocator = {
     project_name: string,
     participant_id: string,
     trial_id: string,
-    gesture_index: number
+    gesture_index: string
 }
 
 type Trial = {

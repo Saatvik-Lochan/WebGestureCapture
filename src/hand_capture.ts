@@ -1,6 +1,6 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./main";
-import { closeHandGestureBatch, sendHandGestureBatch } from "./http_handler";
+import { sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	const arrayData = getHandDataAsArray(renderer, clock);
@@ -66,41 +66,6 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
 	return finalData;
 }
 
-
-async function streamHandCapture(durationMs: number, renderer: WebGLRenderer) {
-	const clock = new Clock(true);
-	let capturedData = [];
-
-	// Keep this large, as there is no provision for if one request reaches
-	// before another one. 1000 frames is around 15 seconds
-	const frameBatchSize = 1000;
-	let lastPromise = Promise.resolve();
-	let batchNumber = 0
-
-	frameListeners[1] = () => {
-		capturedData.push(getHandDataAsArray(renderer, clock));
-
-		if (capturedData.length >= frameBatchSize) {
-			// send data captured so far
-			// promise part might be useless (come back to it)
-			lastPromise = lastPromise.then((_) => convertAndSendCapturedData(batchNumber++));
-
-			// reset capturedData
-			capturedData = [];
-		}
-	}
-		
-	await new Promise(resolve => setTimeout(resolve, durationMs));
-	delete frameListeners[1];
-	await convertAndSendCapturedData(batchNumber); // send any yet unsent data
-	closeHandGestureBatch(); // close the gesture for appends
-
-	async function convertAndSendCapturedData(batchNumber: number) {
-		const capturedAsFloatArray = new Float32Array(capturedData);
-		await sendHandGestureBatch(capturedAsFloatArray.buffer);
-	}
-}
-
 async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) {
 	// setting as 0 for now
 	const clock = new Clock(true);
@@ -115,4 +80,26 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	return capturedData.flat();
 }
 
-export { captureHandSequence, streamHandCapture };
+async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator,
+		blockSize: number = 1000) {
+
+	const clock = new Clock(true);
+	let capturedData: number[][] = [];
+	startHandGestureTransfer(gestureLocator);
+	
+	frameListeners[1] = 
+		() => {
+			capturedData.push(getHandDataAsArray(renderer, clock));
+
+			if (capturedData.length > blockSize) {
+				const dataAsFloatArr = new Float32Array(capturedData.flat());
+				sendHandGestureBatch(dataAsFloatArr, gestureLocator);
+				capturedData = [];
+			}
+		}
+
+	await new Promise(resolve => setTimeout(resolve, durationMs));
+	delete frameListeners[1];
+}
+
+export { captureHandSequence, streamHandData };

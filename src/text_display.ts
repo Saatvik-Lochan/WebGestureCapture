@@ -34,9 +34,20 @@ type TextSequence = TextInstance[];
 
 // useful shortcuts
 function displayString(str: string, duration: number, scene: Scene, 
-    style={size: 1, xpos: 0, ypos: 0}) {
+    style: Style={size: 1, xpos: 0, ypos: 0}) {
 
-    displayTextSequence([{textGroup: [{text: str, style: style}], duration: duration}], scene);
+    return displayTextSequence([{textGroup: [{text: str, style: style}], duration }], scene);
+}
+
+function displayForReadableTime(str: string, scene: Scene,
+    style: Style={size: 1, xpos: 0, ypos: 0}) {
+
+    return displayString(str, getReadTime(), scene);
+
+    function getReadTime(timePerWord = 1000) {
+        const wordNum = str.split(" ").length;
+        return wordNum * timePerWord;
+    }
 }
 
 // promise definitions
@@ -120,4 +131,4 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     return textGroup.map((text) => loadText(text, font, scene));
 }
 
-export { loadFont, displayTextSequence, countDown, Style, displayString };
+export { loadFont, displayTextSequence, countDown, Style, displayString, displayForReadableTime };
