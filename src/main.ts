@@ -3,9 +3,9 @@ import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { loadFont, countDown, Style, displayString } from "./text_display";
 import { captureHandSequence } from "./hand_capture";
-import { sendData, sendHandGestureBatch } from "./http_handler";
+import { getNextTrial, sendData } from "./http_handler";
 import { loadBeep, playBeep } from "./audio";
-import { sendFormData } from "./test";
+import { performTrial } from "./trial_manager";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -17,19 +17,7 @@ let frameListeners: { [key: string]: () => any } = {};
 let project: string = "test";
 let participant: string = "10-05929bdb7d";
 
-// state variables
-let capturingHandData = false;
-
-// container variables
-let allHandData = [];
-
-test();
-// main();
-
-async function test() {
-    await init();
-    animate();
-}
+main();
 
 async function main() {
     await init();
@@ -100,18 +88,9 @@ function animate() {
     });
 }
 
-function vrSequence() {
-    Promise.all([loadFont(), loadBeep()]) // load font and beep
-        .then((_) => countDown(3, scene, new Style())) // countdown
-        .then((_) =>
-            Promise.all(
-                [displayString("Perform your gesture", 3000, scene),
-                 captureHandSequence(3000, renderer),
-                 playBeep(audio)])) // play beep and start recording
-        .then((promiseResults) =>
-            Promise.all(
-                [sendData({ "result": promiseResults[1] }, "gestures"),
-                playBeep(audio)])); // play beep and send data
+async function vrSequence() {
+    const trial = await getNextTrial(project, participant) as Trial
+    await performTrial(trial, scene, renderer, project, participant);
 }
 
 export { frameListeners, project, participant, audio };

@@ -46,4 +46,14 @@ async function sendData(data: object, route = "", method="POST") {
     })
 }
 
-export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer}
+async function getNextTrial(project_name: string, participant_id: string) {
+    const response = await fetch(
+        `${backend_url}/trial/next-trial/${project_name}/${participant_id}`, {
+            method: 'GET',
+        }
+    );
+
+    return await response.json();
+}
+
+export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer, getNextTrial}

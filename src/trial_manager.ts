@@ -38,7 +38,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
     const countDownTime = 3;
     await Promise.all([
         countDown(countDownTime, scene, new Style(0.75, 0, 0)), 
-        displayString(gesture.instruction, countDownTime * 1000 - 100, scene, new Style(1, 0, 1)),
+        displayString(gesture.instruction, countDownTime * 1000 - 100, scene, new Style(0.5, 0, 1)),
     ]);
 
     const duration = gesture.duration;

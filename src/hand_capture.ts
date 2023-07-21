@@ -92,14 +92,19 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestu
 			capturedData.push(getHandDataAsArray(renderer, clock));
 
 			if (capturedData.length > blockSize) {
-				const dataAsFloatArr = new Float32Array(capturedData.flat());
-				sendHandGestureBatch(dataAsFloatArr, gestureLocator);
+				sendCaptured();
 				capturedData = [];
 			}
 		}
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[1];
+	sendCaptured();
+
+	function sendCaptured() {
+		const dataAsFloatArr = new Float32Array(capturedData.flat());
+		sendHandGestureBatch(dataAsFloatArr, gestureLocator);
+	}
 }
 
 export { captureHandSequence, streamHandData };
