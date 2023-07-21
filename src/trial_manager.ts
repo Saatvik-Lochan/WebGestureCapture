@@ -44,10 +44,10 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
         displayString(gesture.instruction, countDownTime * 1000 - 100, scene, new Style(0.5, 0, 1)),
     ]);
 
-    const duration = gesture.duration;
+    const durationMs = gesture.duration * 1000;
     await Promise.all([
-        streamHandData(duration, renderer, gestureLocator),
-        displayString("Perform gesture", duration, scene, new Style(0.5, 0, 0))
+        streamHandData(durationMs, renderer, gestureLocator),
+        displayString("Perform gesture", durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
     playBeep(audio);
