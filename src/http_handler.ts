@@ -1,28 +1,11 @@
-import { project, participant, trial, gesture } from "./main";
 const backend_url = "https://gesturelogger.com:8000";
 
-// formatters
-function formatHandData(handData: any, title: string) {
-    return {
-        title: title,
-        data: handData
-    }
-}
-
-async function closeHandGestureBatch() {
-    return await fetch(
-        `${backend_url}/data/close/${project}/${participant}/${trial}/${gesture}`, {
-            method: "POST",
-            body: null,
-    });
-}
-
-async function sendHandGestureBatch(data: ArrayBuffer) {
+async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
     const formData = new FormData();
-    formData.append('project_name', project);
-    formData.append('participant_id', participant);
-    formData.append('trial_id', trial);
-    formData.append('gesture_index', gesture);
+    formData.append('project_name', gestureLocator.project_name);
+    formData.append('participant_id', gestureLocator.participant_id);
+    formData.append('trial_id', gestureLocator.trial_id);
+    formData.append('gesture_index', gestureLocator.gesture_index.toFixed(0));
     formData.append('data', new Blob([data]));
 
     console.log(formData);
@@ -47,4 +30,4 @@ async function sendData(data: object, route = "", method="POST") {
     })
 }
 
-export { sendData, sendHandGestureBatch, closeHandGestureBatch, backend_url}
+export { sendData, sendHandGestureBatch, backend_url}

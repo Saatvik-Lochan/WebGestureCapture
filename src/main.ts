@@ -16,8 +16,6 @@ let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
 let project: string = "test";
 let participant: string = "10-05929bdb7d";
-let trial: string = "1";
-let gesture: string = "0";
 
 // state variables
 let capturingHandData = false;
@@ -31,13 +29,6 @@ test();
 async function test() {
     await init();
     animate();
-    renderer.xr.addEventListener('sessionstart', async () => {
-        const data = await captureHandSequence(2000, renderer);
-        console.log(data.slice(0, 100))
-        const floatArray = new Float32Array(data);
-        const result = await sendHandGestureBatch(floatArray.buffer);
-        console.log(result);
-    });
 }
 
 async function main() {
@@ -123,4 +114,4 @@ function vrSequence() {
                 playBeep(audio)])); // play beep and send data
 }
 
-export { frameListeners, project, participant, trial, gesture };
+export { frameListeners, project, participant };
