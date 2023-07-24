@@ -105,7 +105,7 @@ function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
 
 function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     function loadText(text: Text, font: Font, scene: Scene): Object3D {
-        var geometry = new TextGeometry(text.text, {
+        const geometry = new TextGeometry(text.text, {
             font: font,
             size: text.style.size,
             height: 0.01,
@@ -116,18 +116,31 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
             bevelSegments: 3
         });
 
-        // position text
-        geometry.center();
-        geometry.translate(text.style.xpos, text.style.ypos, -10);
+        const materialFront = new MeshBasicMaterial( { color: 0xff0000 } );
+	    const materialSide = new MeshBasicMaterial( { color: 0x000088 } );
+	    const materialArray = [ materialFront, materialSide ];
 
-        // add material and mesh
-        var material = new MeshBasicMaterial({ color: 0xffffff });
-        var mesh = new Mesh(geometry, material);
-        mesh.name = 'text';
+	    var textMesh = new Mesh(geometry, materialArray );
 
-        // add to scene and return
-        scene.add(mesh);
-        return mesh;
+        geometry.computeBoundingBox();
+        var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+        
+        textMesh.position.set( -0.5 * textWidth, 50, 100 );
+        scene.add(textMesh);
+        return textMesh;
+
+        // // position text
+        // geometry.center();
+        // geometry.translate(text.style.xpos, text.style.ypos, -10);
+
+        // // add material and mesh
+        // const material = new MeshBasicMaterial({ color: 0xffffff });
+        // const mesh = new Mesh(geometry, material);
+        // mesh.name = 'text';
+
+        // // add to scene and return
+        // scene.add(mesh);
+        // return mesh;
     }
 
     return textGroup.map((text) => loadText(text, font, scene));
