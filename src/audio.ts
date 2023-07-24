@@ -15,7 +15,7 @@ function loadBeep() {
 
 function playBeep(audio: Audio) {
 	audio.setBuffer(loadedBeep);
-	audio.setVolume(0.5);
+	audio.setVolume(0.25);
 	audio.play();
 }
 

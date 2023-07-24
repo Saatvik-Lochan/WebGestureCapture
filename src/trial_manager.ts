@@ -35,7 +35,7 @@ async function performTrial(
         }
     }
 
-    // completeTrial(trialToPerform.trial_id, project_name, participant_id);
+    completeTrial(trialToPerform.trial_id, project_name, participant_id);
 }
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
@@ -53,7 +53,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
         displayString("Perform gesture", durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
-    // playBeep(audio);
+    playBeep(audio);
     await new Promise(resolve => setTimeout(resolve, 1000));
 }
 
