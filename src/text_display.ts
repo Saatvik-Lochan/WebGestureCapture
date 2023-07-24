@@ -44,9 +44,9 @@ function displayForReadableTime(str: string, scene: Scene,
 
     return displayString(str, getReadTime(), scene);
 
-    function getReadTime(timePerWord = 1500) {
+    function getReadTime(timePerWord = 1000) {
         const wordNum = str.split(/[ \n\t]/).length;
-        return wordNum * timePerWord;
+        return wordNum * timePerWord + 2000;
     }
 }
 

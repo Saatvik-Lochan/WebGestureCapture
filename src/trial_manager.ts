@@ -35,7 +35,9 @@ async function performTrial(
         }
     }
 
-    completeTrial(trialToPerform.trial_id, project_name, participant_id);
+    console.log(trialToPerform.trial_id);
+    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
+    await displayString("The trial is over, you may take off the headset", 100000, scene);
 }
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {

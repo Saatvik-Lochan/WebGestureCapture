@@ -14,8 +14,8 @@ let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
-let project: string = "test";
-let participant: string = "0-f609081bf1";
+let project: string;
+let participant: string;
 
 main();
 
@@ -30,7 +30,7 @@ async function init() {
     initCameraAndScene();
     initAudio();
     initHands();
-    // initProject();
+    initProject();
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -75,9 +75,6 @@ async function init() {
 
         if (!(project && participant)) 
             window.alert("Your data is not being recorded. Project and participant not set")
-
-        const response = await sendData(null, `trial/${project}/${participant}`, "GET");
-        console.log(response.body);
     }
 }
 
@@ -90,7 +87,11 @@ function animate() {
 
 async function vrSequence() {
     const trial = await getNextTrial(project, participant) as Trial
-    await performTrial(trial, scene, renderer, project, participant);
+
+    if (trial == null)
+        window.alert("No pending trials")
+    else
+        await performTrial(trial, scene, renderer, project, participant);
 }
 
 export { frameListeners, project, participant, audio };
