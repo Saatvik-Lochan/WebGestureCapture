@@ -44,8 +44,8 @@ function displayForReadableTime(str: string, scene: Scene,
 
     return displayString(str, getReadTime(), scene);
 
-    function getReadTime(timePerWord = 1000) {
-        const wordNum = str.split(" ").length;
+    function getReadTime(timePerWord = 1500) {
+        const wordNum = str.split(/[ \n\t]/).length;
         return wordNum * timePerWord;
     }
 }
@@ -108,7 +108,7 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
         const geometry = new TextGeometry(text.text, {
             font: font,
             size: text.style.size,
-            height: 0.01,
+            height: 0.1,
             curveSegments: 4,
             bevelEnabled: true,
             bevelThickness: 0.02,
@@ -116,16 +116,18 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
             bevelSegments: 3
         });
 
-        const materialFront = new MeshBasicMaterial( { color: 0xff0000 } );
-	    const materialSide = new MeshBasicMaterial( { color: 0x000088 } );
+        const materialFront = new MeshBasicMaterial( { color: 0xffffff } );
+	    const materialSide = new MeshBasicMaterial( { color: 0x333333 } );
 	    const materialArray = [ materialFront, materialSide ];
 
 	    var textMesh = new Mesh(geometry, materialArray );
+        console.log(textMesh.position)
 
         geometry.computeBoundingBox();
         var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
         
-        textMesh.position.set( -0.5 * textWidth, 0, 1 );
+        textMesh.position.set( -0.5 * textWidth, 0, -10);
+        geometry.translate(text.style.xpos, text.style.ypos, -10);
         scene.add(textMesh);
         return textMesh;
 
