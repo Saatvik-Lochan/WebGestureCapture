@@ -51,7 +51,6 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
     ]);
 
     playBeep(audio);
-    console.log("I tried to beep");
     await new Promise(resolve => setTimeout(resolve, 1000));
 }
 
