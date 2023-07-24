@@ -125,7 +125,7 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
         geometry.computeBoundingBox();
         var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
         
-        textMesh.position.set( -0.5 * textWidth, 50, 100 );
+        textMesh.position.set( -0.5 * textWidth, 0, 1 );
         scene.add(textMesh);
         return textMesh;
 
