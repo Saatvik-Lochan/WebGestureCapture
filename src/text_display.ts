@@ -52,6 +52,8 @@ function displayForReadableTime(str: string, scene: Scene,
 
 // promise definitions
 function loadFont() {
+    if (font != null) return;
+
     return new Promise((resolve) => {
         const fontLoader = new FontLoader();
         const currentFont = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';

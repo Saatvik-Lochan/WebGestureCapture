@@ -56,4 +56,12 @@ async function getNextTrial(project_name: string, participant_id: string) {
     return await response.json();
 }
 
-export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer, getNextTrial}
+async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
+    return await fetch(
+        `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
+            method: 'POST',
+        }
+    );
+}
+
+export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer, getNextTrial, completeTrial}

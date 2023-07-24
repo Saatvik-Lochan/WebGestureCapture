@@ -15,7 +15,7 @@ let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
 let frameListeners: { [key: string]: () => any } = {};
 let project: string = "test";
-let participant: string = "10-05929bdb7d";
+let participant: string = "0-f609081bf1";
 
 main();
 

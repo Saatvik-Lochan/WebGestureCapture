@@ -3,6 +3,7 @@ import { loadBeep, playBeep } from "./audio";
 import { streamHandData } from "./hand_capture";
 import { Style, countDown, displayForReadableTime, displayString, loadFont } from "./text_display";
 import { audio } from "./main";
+import { completeTrial } from "./http_handler";
 
 async function performTrial(
     trialToPerform: Trial, 
@@ -33,6 +34,8 @@ async function performTrial(
             gesture_index: gesture_index.toFixed(0)
         }
     }
+
+    completeTrial(trialToPerform.trial_id, project_name, participant_id);
 }
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
