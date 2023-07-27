@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, Object3D, Scene } from 'three';
+import { Mesh, MeshBasicMaterial, Object3D, Scene, Vector3 } from 'three';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
@@ -139,24 +139,11 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
 
         geometry.computeBoundingBox();
         var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+        var textHeight = geometry.boundingBox.max.y - geometry.boundingBox.min.y
         
-        textMesh.position.set( -0.5 * textWidth, 0, -10);
-        geometry.translate(text.style.xpos, text.style.ypos, -10);
-        scene.add(textMesh);
+        textMesh.position.set( -0.5 * textWidth, 0.5*textHeight, -10);
+        textMesh.position.add(new Vector3(text.style.xpos, text.style.ypos, 0));
         return textMesh;
-
-        // // position text
-        // geometry.center();
-        // geometry.translate(text.style.xpos, text.style.ypos, -10);
-
-        // // add material and mesh
-        // const material = new MeshBasicMaterial({ color: 0xffffff });
-        // const mesh = new Mesh(geometry, material);
-        // mesh.name = 'text';
-
-        // // add to scene and return
-        // scene.add(mesh);
-        // return mesh;
     }
 
     return textGroup.map((text) => loadText(text, font, scene));
