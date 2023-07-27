@@ -6,6 +6,7 @@ import { captureHandSequence } from "./hand_capture";
 import { getNextTrial, sendData } from "./http_handler";
 import { loadBeep, playBeep } from "./audio";
 import { performTrial } from "./trial_manager";
+import { createInteractBox } from "./interact";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -17,7 +18,22 @@ let frameListeners: { [key: string]: () => any } = {};
 let project: string;
 let participant: string;
 
-main();
+test();
+// main();
+
+async function test() {
+    await init();
+    animate();
+    renderer.xr.addEventListener('sessionstart', async () => {
+        await createInteractBox(scene);
+        console.log("button pressed")
+        
+        await loadFont();
+        await displayString("Button pressed", 5000, scene);
+        console.log("string displayed")
+        renderer.xr.getSession().end();
+    });
+}
 
 async function main() {
     await init();
@@ -30,7 +46,7 @@ async function init() {
     initCameraAndScene();
     initAudio();
     initHands();
-    initProject();
+    // initProject();
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -94,4 +110,4 @@ async function vrSequence() {
         await performTrial(trial, scene, renderer, project, participant);
 }
 
-export { frameListeners, project, participant, audio };
+export { frameListeners, project, participant, audio, hands };

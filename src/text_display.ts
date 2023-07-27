@@ -39,6 +39,12 @@ function displayString(str: string, duration: number, scene: Scene,
     return displayTextSequence([{textGroup: [{text: str, style: style}], duration }], scene);
 }
 
+function displayStringIndefinitely(text: string, scene: Scene, 
+    style: Style={size: 1, xpos: 0, ypos: 0}) {
+
+    return displayIndefinitely([{text, style}], scene);
+}
+
 function displayForReadableTime(str: string, scene: Scene,
     style: Style={size: 1, xpos: 0, ypos: 0}) {
 
@@ -64,6 +70,14 @@ function loadFont() {
             resolve(font);
         });
     });
+}
+
+function displayIndefinitely(textGroup: TextGroup, scene: Scene) {
+    return loadTextGroup(textGroup, scene);
+}
+
+function clearDisplayIndefinitely(object: Object3D[], scene: Scene) {
+    clearTextGroup(object, scene);
 }
 
 async function displayTextSequence(textSequence: TextSequence, scene: Scene) {
@@ -148,4 +162,4 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     return textGroup.map((text) => loadText(text, font, scene));
 }
 
-export { loadFont, displayTextSequence, countDown, Style, displayString, displayForReadableTime };
+export { loadFont, displayTextSequence, countDown, Style, displayString, displayForReadableTime, displayIndefinitely, clearDisplayIndefinitely, displayStringIndefinitely };

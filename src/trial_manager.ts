@@ -1,9 +1,10 @@
-import { WebGLRenderer } from "three";
+import { Camera, WebGLRenderer } from "three";
 import { loadBeep, playBeep } from "./audio";
 import { streamHandData } from "./hand_capture";
-import { Style, countDown, displayForReadableTime, displayString, loadFont } from "./text_display";
+import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, loadFont } from "./text_display";
 import { audio } from "./main";
 import { completeTrial } from "./http_handler";
+import { createInteractBox } from "./interact";
 
 async function performTrial(
     trialToPerform: Trial, 
@@ -41,22 +42,18 @@ async function performTrial(
 }
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
-    await displayForReadableTime(gesture.instruction, scene);
-
-    const countDownTime = 3;
-    await Promise.all([
-        countDown(countDownTime, scene, new Style(0.75, 0, 0)), 
-        displayString(gesture.instruction, countDownTime * 1000 - 100, scene, new Style(0.5, 0, 1)),
-    ]);
+    const textObj = displayStringIndefinitely(gesture.instruction, scene, new Style(0.5, 0, 1));
+    await createInteractBox(scene)
+    clearDisplayIndefinitely(textObj, scene);
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
         streamHandData(durationMs, renderer, gestureLocator),
-        displayString("Perform gesture", durationMs, scene, new Style(0.5, 0, 0))
+        displayString("recording gesture...", durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
     playBeep(audio);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 export { performTrial }
