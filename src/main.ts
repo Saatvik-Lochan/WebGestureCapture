@@ -25,13 +25,27 @@ async function test() {
     await init();
     animate();
     renderer.xr.addEventListener('sessionstart', async () => {
-        await createInteractBox(scene);
-        console.log("button pressed")
-        
-        await loadFont();
-        await displayString("Button pressed", 5000, scene);
-        console.log("string displayed")
-        renderer.xr.getSession().end();
+        const trial: Trial = {
+            "trial_id": "1",
+            "trial_name": "test",
+            "instructions": "Place your hands in the box then remove\nthem to go to the next instruction",
+            "gestures": [
+                {
+                    "gesture_id": "1",
+                    "gesture_name": "Clap",
+                    "duration": 2,
+                    "instruction": "Clap your hands",
+                },
+                {
+                    "gesture_id": "1",
+                    "gesture_name": "Thumbs up",
+                    "duration": 2,
+                    "instruction": "Do a thumbs up with both hands",
+                }
+            ]
+        }
+        console.log("trial performance started");
+        await performTrial(trial, scene, renderer, project, participant, false);
     });
 }
 

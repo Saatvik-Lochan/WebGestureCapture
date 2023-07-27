@@ -8,7 +8,7 @@ type GestureLocator = {
 type Trial = {
     trial_id: string;
     trial_name: string;
-    options: {
+    options?: {
         instructionDuration: number
     };
     instructions: string;
@@ -16,7 +16,7 @@ type Trial = {
 };
 
 type Gesture = {
-    options: {
+    options?: {
         instructionDuration: number,
     };
     gesture_id: string;

@@ -119,34 +119,40 @@ function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
 
 function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     function loadText(text: Text, font: Font, scene: Scene): Object3D {
-        const geometry = new TextGeometry(text.text, {
-            font: font,
-            size: text.style.size,
-            height: 0.1,
-            curveSegments: 4,
-            bevelEnabled: true,
-            bevelThickness: 0.02,
-            bevelSize: 0.05,
-            bevelSegments: 3
-        });
-
-        const materialFront = new MeshBasicMaterial( { color: 0xffffff } );
-	    const materialSide = new MeshBasicMaterial( { color: 0x333333 } );
-	    const materialArray = [ materialFront, materialSide ];
-
-	    var textMesh = new Mesh(geometry, materialArray );
-        console.log(textMesh.position)
-
-        geometry.computeBoundingBox();
-        var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
-        var textHeight = geometry.boundingBox.max.y - geometry.boundingBox.min.y
-        
-        textMesh.position.set( -0.5 * textWidth, 0.5*textHeight, -10);
-        textMesh.position.add(new Vector3(text.style.xpos, text.style.ypos, 0));
+        const textMesh = getCenteredText(text.text, text.style.size, 0.1, font);
+        textMesh.position.add(new Vector3(text.style.xpos, text.style.ypos, -10));
+        scene.add(textMesh);
         return textMesh;
     }
 
     return textGroup.map((text) => loadText(text, font, scene));
 }
 
-export { loadFont, displayTextSequence, countDown, Style, displayString, displayForReadableTime, displayIndefinitely, clearDisplayIndefinitely, displayStringIndefinitely };
+function getCenteredText(text: string, size: number, height: number, font: Font) {
+    const geometry = new TextGeometry(text, {
+        font: font,
+        size,
+        height,
+        curveSegments: 4,
+        bevelEnabled: true,
+        bevelThickness: 0.02,
+        bevelSize: 0.05,
+        bevelSegments: 3
+    });
+
+    const materialFront = new MeshBasicMaterial( { color: 0xffffff } );
+    const materialSide = new MeshBasicMaterial( { color: 0x333333 } );
+    const materialArray = [ materialFront, materialSide ];
+
+    var textMesh = new Mesh(geometry, materialArray );
+    console.log(textMesh.position)
+
+    geometry.computeBoundingBox();
+    var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+    var textHeight = geometry.boundingBox.max.y - geometry.boundingBox.min.y
+    
+    textMesh.position.set( -0.5 * textWidth, 0.5*textHeight, 0);
+    return textMesh
+}
+
+export { loadFont, displayTextSequence, countDown, Style, displayString, displayForReadableTime, displayIndefinitely, clearDisplayIndefinitely, displayStringIndefinitely, getCenteredText, font };

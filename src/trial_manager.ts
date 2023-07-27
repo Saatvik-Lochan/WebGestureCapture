@@ -1,14 +1,17 @@
 import { Camera, WebGLRenderer } from "three";
 import { loadBeep, playBeep } from "./audio";
 import { streamHandData } from "./hand_capture";
-import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, loadFont } from "./text_display";
+import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { audio } from "./main";
 import { completeTrial } from "./http_handler";
 import { createInteractBox } from "./interact";
 
 async function displaySkipableInstruction(instruction: string, scene: THREE.Scene) {
     const textObj = displayStringIndefinitely(instruction, scene, new Style(0.5, 0, 0));
-    await createInteractBox(scene)
+    await createInteractBox(scene, 
+        {"enterText": "testing",
+         "removeText": "removing",
+         font});
     clearDisplayIndefinitely(textObj, scene);
 }
 
@@ -17,9 +20,11 @@ async function performTrial(
     scene: THREE.Scene, 
     renderer: WebGLRenderer, 
     project_name: string, 
-    participant_id: string) 
+    participant_id: string,
+    sendData: boolean = true) 
     {
     await Promise.all([loadFont(), loadBeep()]);
+    console.log("trial started");
     await displaySkipableInstruction(trialToPerform.instructions, scene);
 
     for (let i = 0; i < trialToPerform.gestures.length; i++) {
@@ -28,7 +33,8 @@ async function performTrial(
             gestureToPerform,
             getGestureLocator(i),
             scene,
-            renderer
+            renderer,
+            sendData
         )
     }
 
@@ -42,21 +48,22 @@ async function performTrial(
     }
 
     console.log(trialToPerform.trial_id);
-    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
-    await displayString("The trial is over, you may take off the headset", 100000, scene);
+    if (sendData) await completeTrial(trialToPerform.trial_id, project_name, participant_id);
+    displayStringIndefinitely("The trial is over, you may take off the headset", scene, new Style(0.5, 0, 0));
 }
 
-async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
+async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer, 
+    sendData: boolean) {
     await displaySkipableInstruction(gesture.instruction, scene);
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
-        streamHandData(durationMs, renderer, gestureLocator),
+        () => {if (sendData) streamHandData(durationMs, renderer, gestureLocator)},
         displayString("recording gesture...", durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
-    playBeep(audio);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // playBeep(audio);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 }
 
 export { performTrial }
