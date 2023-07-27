@@ -83,6 +83,7 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator,
 		blockSize: number = 1000) {
 
+	console.log("stream hand data called");
 	const clock = new Clock(true);
 	let capturedData: number[][] = [];
 	startHandGestureTransfer(gestureLocator);
