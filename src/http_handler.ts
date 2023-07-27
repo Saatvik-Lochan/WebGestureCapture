@@ -53,7 +53,7 @@ async function getNextTrial(project_name: string, participant_id: string) {
         }
     );
 
-    return await response.json();
+    return response
 }
 
 async function completeTrial(trial_id: string, project_name: string, participant_id: string) {

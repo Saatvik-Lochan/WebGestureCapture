@@ -14,7 +14,7 @@ let frameListeners: { [key: string]: () => any } = {};
 let project: string;
 let participant: string;
 
-test();
+main();
 // main();
 
 async function test() {
@@ -48,7 +48,6 @@ async function test() {
 async function main() {
     await init();
     animate();
-    renderer.xr.addEventListener('sessionstart', vrSequence);
 }
 
 async function init() {
@@ -102,13 +101,22 @@ async function init() {
 
         try {
             if (project && participant) {
-                const trial = await getNextTrial(project, participant) as Trial;
+                const response = await getNextTrial(project, participant);
 
-                if (trial) {
-                    document.body.appendChild(VRButton.createButton(renderer));
-                    message = "You have a pending trial, press Enter VR";
-                } else {
-                    message = "You have no pending trials"
+                switch (response.status) {
+                    case 200:
+                        document.body.appendChild(VRButton.createButton(renderer));
+                        const trial = await response.json();
+                        message = "You have pending trials. Click 'Enter VR' to start"
+                        
+                        renderer.xr.addEventListener('sessionstart', () => {
+                            performTrial(trial, scene, renderer, project, participant)
+                        });
+                        renderer.xr.addEventListener('sessionend', location.reload);
+                        
+                        break;
+                    default:
+                        message = await response.text();
                 }
             } else {
                 message = "Project and participant are not set"
@@ -133,15 +141,6 @@ function animate() {
         Object.values(frameListeners).forEach((fcn: () => any) => (fcn()));
         renderer.render(scene, camera);
     });
-}
-
-async function vrSequence() {
-    const trial = await getNextTrial(project, participant) as Trial
-
-    if (trial == null)
-        window.alert("No pending trials")
-    else
-        await performTrial(trial, scene, renderer, project, participant);
 }
 
 export { frameListeners, project, participant, audio, hands };
