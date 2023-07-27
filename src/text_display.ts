@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, Object3D, Scene, Vector3 } from 'three';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import { TextGeometry, TextGeometryParameters } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 // object type definitions
 let font: Font;
@@ -119,7 +119,18 @@ function clearTextGroup(textObjectGroup: Object3D[], scene: Scene) {
 
 function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     function loadText(text: Text, font: Font, scene: Scene): Object3D {
-        const textMesh = getCenteredText(text.text, text.style.size, 0.1, font);
+        const textProperties: TextGeometryParameters = {
+            font: font,
+            size: text.style.size,
+            height: 0.1,
+            curveSegments: 4,
+            bevelEnabled: true,
+            bevelThickness: 0.02,
+            bevelSize: 0.05,
+            bevelSegments: 3
+        }
+
+        const textMesh = getCenteredText(text.text, textProperties);
         textMesh.position.add(new Vector3(text.style.xpos, text.style.ypos, -10));
         scene.add(textMesh);
         return textMesh;
@@ -128,28 +139,18 @@ function loadTextGroup(textGroup: TextGroup, scene: Scene): Object3D[] {
     return textGroup.map((text) => loadText(text, font, scene));
 }
 
-function getCenteredText(text: string, size: number, height: number, font: Font) {
-    const geometry = new TextGeometry(text, {
-        font: font,
-        size,
-        height,
-        curveSegments: 4,
-        bevelEnabled: true,
-        bevelThickness: 0.02,
-        bevelSize: 0.05,
-        bevelSegments: 3
-    });
+function getCenteredText(text: string, textProperties: TextGeometryParameters) {
+    const geometry = new TextGeometry(text, textProperties);
 
     const materialFront = new MeshBasicMaterial( { color: 0xffffff } );
     const materialSide = new MeshBasicMaterial( { color: 0x333333 } );
     const materialArray = [ materialFront, materialSide ];
 
-    var textMesh = new Mesh(geometry, materialArray );
-    console.log(textMesh.position)
+    const textMesh = new Mesh(geometry, materialArray );
 
     geometry.computeBoundingBox();
-    var textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
-    var textHeight = geometry.boundingBox.max.y - geometry.boundingBox.min.y
+    const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+    const textHeight = geometry.boundingBox.max.y - geometry.boundingBox.min.y
     
     textMesh.position.set( -0.5 * textWidth, 0.5*textHeight, 0);
     return textMesh

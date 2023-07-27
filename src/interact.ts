@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { frameListeners, hands } from "./main";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+import { TextGeometry, TextGeometryParameters } from "three/examples/jsm/geometries/TextGeometry";
 import { Font } from "three/examples/jsm/loaders/FontLoader";
 import { MeshBasicMaterial } from "three";
 import { getCenteredText } from "./text_display";
@@ -15,6 +15,18 @@ type interactText = {
 }
 
 function createInteractBox(scene: THREE.Scene, text: interactText = null) {
+    const textProperties: TextGeometryParameters = {
+        font: text.font,
+        size: 0.05,
+        height: 0.01,
+        bevelEnabled: false,
+        bevelThickness: 0.02,
+        bevelSize: 0.05,
+        bevelSegments: 3
+    }
+
+    let textMesh;
+
     return new Promise(resolve => {
         // Create the cube itself
         const cubeGeom = new THREE.BoxGeometry( 1, 0.4, 1 );
@@ -38,37 +50,54 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
         let wasInBox = false;
 
         if (text) {
-            // interact text
-            const size = 0.1;
-            const textMesh = getCenteredText(text.enterText, size, 0.01, text.font);
-            textMesh.position.set(0, box.max.y + size, box.min.z)
-            scene.add(textMesh);
-            console.log("Text setted");
+            updateText(text.enterText);
         }
-
-        
-        
-
 
     
         frameListeners["button"] = () => {
             if (handsInBox(hands, box)) {
-                cube.material = redMaterial;
-                wasInBox = true;
+                onHandsEnterBox();
             } else if (wasInBox) {
-                deleteBox();
+                onPress();
             }
         };
+
+        function onHandsEnterBox() {
+            cube.material = redMaterial;
+            updateText(text.removeText);
+            wasInBox = true;
+        }
+
+        function onPress() {
+            clearText();
+            deleteBox();
+        }
 
         function deleteBox() {
             scene.remove(cube);
             scene.remove(wireframe)
             resolve(undefined);
         }
-    })
 
-
+        function updateText(str: string) {
+            clearText();
+            setText(str);
     
+            function setText(str: string) {
+                textMesh = getCenteredText(str, textProperties);
+                textMesh.position.add(new THREE.Vector3(0, box.max.y, box.min.z));
+        
+                const offset = new THREE.Vector3(0, 0, -0.1);
+                textMesh.position.add(offset);
+                textMesh.rotateX(-0.75);
+                scene.add(textMesh);
+            }    
+        }
+    
+        function clearText() {
+            if (textMesh) scene.remove(textMesh);
+        }
+    })
 }
 
 function handsInBox(hands: THREE.XRHandSpace[], box: THREE.Box3) {

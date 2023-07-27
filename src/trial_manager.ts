@@ -6,11 +6,16 @@ import { audio } from "./main";
 import { completeTrial } from "./http_handler";
 import { createInteractBox } from "./interact";
 
-async function displaySkipableInstruction(instruction: string, scene: THREE.Scene) {
+async function displaySkipableInstruction(
+    instruction: string, 
+    enterText: string, 
+    removeText: string, 
+    scene: THREE.Scene) 
+    {
     const textObj = displayStringIndefinitely(instruction, scene, new Style(0.5, 0, 0));
     await createInteractBox(scene, 
-        {"enterText": "testing",
-         "removeText": "removing",
+        {"enterText": enterText,
+         "removeText": removeText,
          font});
     clearDisplayIndefinitely(textObj, scene);
 }
@@ -25,7 +30,11 @@ async function performTrial(
     {
     await Promise.all([loadFont(), loadBeep()]);
     console.log("trial started");
-    await displaySkipableInstruction(trialToPerform.instructions, scene);
+    await displaySkipableInstruction(
+        trialToPerform.instructions, 
+        "Place your hands inside the box when ready",
+        "Remove your hands to continue",
+        scene);
 
     for (let i = 0; i < trialToPerform.gestures.length; i++) {
         const gestureToPerform = trialToPerform.gestures[i];
@@ -54,7 +63,11 @@ async function performTrial(
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer, 
     sendData: boolean) {
-    await displaySkipableInstruction(gesture.instruction, scene);
+    await displaySkipableInstruction(
+        gesture.instruction, 
+        "Place your hands in the box when ready",
+        "Remove your hands to start recording",
+        scene);
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([

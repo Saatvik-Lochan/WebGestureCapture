@@ -1,12 +1,8 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.js";
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { loadFont, countDown, Style, displayString } from "./text_display";
-import { captureHandSequence } from "./hand_capture";
 import { getNextTrial, sendData } from "./http_handler";
-import { loadBeep, playBeep } from "./audio";
 import { performTrial } from "./trial_manager";
-import { createInteractBox } from "./interact";
 
 // main resources
 let renderer: THREE.WebGLRenderer;
@@ -60,7 +56,7 @@ async function init() {
     initCameraAndScene();
     initAudio();
     initHands();
-    // initProject();
+    initProject();
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -68,7 +64,6 @@ async function init() {
         renderer.xr.enabled = true;
 
         document.body.appendChild(renderer.domElement);
-        document.body.appendChild(VRButton.createButton(renderer));
     }
 
     function initCameraAndScene() {
@@ -103,8 +98,33 @@ async function init() {
         project = urlParams.get('project');
         participant = urlParams.get('participant');
 
-        if (!(project && participant)) 
-            window.alert("Your data is not being recorded. Project and participant not set")
+        let message = "Unknown error";
+
+        try {
+            if (project && participant) {
+                const trial = await getNextTrial(project, participant) as Trial;
+
+                if (trial) {
+                    document.body.appendChild(VRButton.createButton(renderer));
+                    message = "You have a pending trial, press Enter VR";
+                } else {
+                    message = "You have no pending trials"
+                }
+            } else {
+                message = "Project and participant are not set"
+            }
+        } catch (err) {
+            console.log(err);
+            message = "Issue connecting to server, try again later"
+        } finally {
+            setText(message);
+        }
+
+
+        function setText(message: string) {
+            document.getElementById("instruction-text").innerText = message;
+        }
+       
     }
 }
 
