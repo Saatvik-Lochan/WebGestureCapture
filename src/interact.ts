@@ -71,6 +71,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
         function onPress() {
             clearText();
             deleteBox();
+            delete frameListeners["button"];
         }
 
         function deleteBox() {
