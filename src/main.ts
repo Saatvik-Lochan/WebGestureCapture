@@ -41,7 +41,7 @@ async function test() {
             ]
         }
         console.log("trial performance started");
-        await performTrial(trial, scene, renderer, project, participant, false);
+        await performTrial(trial, scene, renderer, project, participant);
     });
 }
 

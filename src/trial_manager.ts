@@ -5,6 +5,7 @@ import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, dis
 import { audio } from "./main";
 import { completeTrial } from "./http_handler";
 import { createInteractBox } from "./interact";
+import { send } from "vite";
 
 async function displaySkipableInstruction(
     instruction: string, 
@@ -25,8 +26,7 @@ async function performTrial(
     scene: THREE.Scene, 
     renderer: WebGLRenderer, 
     project_name: string, 
-    participant_id: string,
-    sendData: boolean = true) 
+    participant_id: string) 
     {
     await Promise.all([loadFont(), loadBeep()]);
     console.log("trial started");
@@ -42,8 +42,7 @@ async function performTrial(
             gestureToPerform,
             getGestureLocator(i),
             scene,
-            renderer,
-            sendData
+            renderer
         )
     }
 
@@ -56,14 +55,12 @@ async function performTrial(
         }
     }
 
-    console.log(trialToPerform.trial_id);
-    if (sendData) await completeTrial(trialToPerform.trial_id, project_name, participant_id);
+    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
     await displayString("The trial is over, you may take off the headset", 5000, scene, new Style(0.5, 0, 0));
     await renderer.xr.getSession().end();
 }
 
-async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer, 
-    sendData: boolean) {
+async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
     await displaySkipableInstruction(
         gesture.instruction, 
         "Place your hands in the box when ready",
@@ -72,7 +69,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
-        () => {if (sendData) streamHandData(durationMs, renderer, gestureLocator)},
+        streamHandData(durationMs, renderer, gestureLocator),
         displayString(`recording gesture for ${gesture.duration}s`, durationMs, scene, new Style(0.5, 0, 0))
     ]);
 

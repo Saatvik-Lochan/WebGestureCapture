@@ -24,14 +24,18 @@ async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLo
     const formData = getFormDataFrom(gestureLocator);
     formData.append('data', new Blob([data]));
 
-    console.log(formData);
+    console.log("data about to be sent");
 
-    return await fetch(
+    const response = await fetch(
         `${backend_url}/gesture-data/append-data`, {
             method: 'POST',
             body: formData
         }
     );
+
+    console.log("response received")
+
+    return response;
 }
 
 // handles sending the data with a POST request

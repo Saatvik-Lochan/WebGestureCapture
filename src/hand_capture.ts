@@ -104,7 +104,7 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestu
 
 	function sendCaptured() {
 		const dataAsFloatArr = new Float32Array(capturedData.flat());
-		sendHandGestureBatch(dataAsFloatArr, gestureLocator);
+		sendHandGestureBatch(dataAsFloatArr.buffer, gestureLocator);
 	}
 }
 
