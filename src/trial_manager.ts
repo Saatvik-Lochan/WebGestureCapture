@@ -73,7 +73,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
         () => {if (sendData) streamHandData(durationMs, renderer, gestureLocator)},
-        displayString("recording gesture...", durationMs, scene, new Style(0.5, 0, 0))
+        displayString(`recording gesture for ${gesture.duration}s`, durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
     // playBeep(audio);
