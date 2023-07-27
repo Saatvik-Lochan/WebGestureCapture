@@ -108,11 +108,13 @@ async function init() {
                         document.body.appendChild(VRButton.createButton(renderer));
                         const trial = await response.json();
                         message = "You have pending trials. Click 'Enter VR' to start"
-                        
+
                         renderer.xr.addEventListener('sessionstart', () => {
                             performTrial(trial, scene, renderer, project, participant)
                         });
-                        renderer.xr.addEventListener('sessionend', location.reload);
+                        renderer.xr.addEventListener('sessionend', () => {
+                            location.reload();
+                        });
                         
                         break;
                     default:

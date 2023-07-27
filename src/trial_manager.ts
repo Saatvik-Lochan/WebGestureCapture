@@ -58,7 +58,7 @@ async function performTrial(
 
     console.log(trialToPerform.trial_id);
     if (sendData) await completeTrial(trialToPerform.trial_id, project_name, participant_id);
-    displayString("The trial is over, you may take off the headset", 5000, scene, new Style(0.5, 0, 0));
+    await displayString("The trial is over, you may take off the headset", 5000, scene, new Style(0.5, 0, 0));
     await renderer.xr.getSession().end();
 }
 
@@ -77,7 +77,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
     ]);
 
     // playBeep(audio);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 export { performTrial }
