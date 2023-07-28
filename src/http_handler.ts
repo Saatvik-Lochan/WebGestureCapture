@@ -31,8 +31,6 @@ async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLo
         }
     );
 
-    console.log("response received")
-
     return response;
 }
 
