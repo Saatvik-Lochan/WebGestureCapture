@@ -113,7 +113,7 @@ async function init() {
                             performTrial(trial, scene, renderer, project, participant)
                         });
                         renderer.xr.addEventListener('sessionend', () => {
-                            // location.reload();
+                            location.reload();
                         });
                         
                         break;
