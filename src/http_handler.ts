@@ -31,6 +31,9 @@ async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLo
         }
     );
 
+    if (response.status == 201)
+        console.log(`sent ${data.byteLength} bytes of gesture data successfully`);
+
     return response;
 }
 
