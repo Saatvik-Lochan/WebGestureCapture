@@ -18,7 +18,7 @@ main();
 // main();
 
 async function test() {
-    await init();
+    await initScene();
     animate();
     renderer.xr.addEventListener('sessionstart', async () => {
         const trial: Trial = {
@@ -46,16 +46,17 @@ async function test() {
 }
 
 async function main() {
-    await init();
+    await initScene();
+    await initProject();
     animate();
 }
 
-async function init() {
+async function initScene() {
     initRenderer();
     initCameraAndScene();
     initAudio();
     initHands();
-    initProject();
+    
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -90,52 +91,51 @@ async function init() {
         }
 
         hands = [0, 1].map((ele) => initHand(ele, "spheres"));
-    }
+    }    
+}
 
-    async function initProject() {
-        const urlParams = new URLSearchParams(window.location.search);
-        project = urlParams.get('project');
-        participant = urlParams.get('participant');
+async function initProject() {
+    const urlParams = new URLSearchParams(window.location.search);
+    project = urlParams.get('project');
+    participant = urlParams.get('participant');
 
-        let message = "Unknown error";
+    let message = "Unknown error";
 
-        try {
-            if (project && participant) {
-                const response = await getNextTrial(project, participant);
+    try {
+        if (project && participant) {
+            const response = await getNextTrial(project, participant);
 
-                switch (response.status) {
-                    case 200:
-                        document.body.appendChild(VRButton.createButton(renderer));
-                        const trial = await response.json();
-                        message = "You have pending trials. Click 'Enter VR' to start"
+            switch (response.status) {
+                case 200:
+                    document.body.appendChild(VRButton.createButton(renderer));
+                    const trial = await response.json();
+                    message = "You have pending trials. Click 'Enter VR' to start"
 
-                        renderer.xr.addEventListener('sessionstart', () => {
-                            performTrial(trial, scene, renderer, project, participant)
-                        });
-                        renderer.xr.addEventListener('sessionend', () => {
-                            location.reload();
-                        });
-                        
-                        break;
-                    default:
-                        message = await response.text();
-                }
-            } else {
-                message = "Project and participant are not set"
+                    renderer.xr.addEventListener('sessionstart', () => {
+                        performTrial(trial, scene, renderer, project, participant)
+                    });
+                    renderer.xr.addEventListener('sessionend', () => {
+                        location.reload();
+                    });
+                    
+                    break;
+                default:
+                    message = await response.text();
             }
-        } catch (err) {
-            console.log(err);
-            message = "Issue connecting to server, try again later"
-        } finally {
-            setText(message);
+        } else {
+            message = "Project and participant are not set"
         }
-
-
-        function setText(message: string) {
-            document.getElementById("instruction-text").innerText = message;
-        }
-       
+    } catch (err) {
+        console.log(err);
+        message = "Issue connecting to server, try again later"
+    } finally {
+        setText(message);
     }
+
+    function setText(message: string) {
+        document.getElementById("instruction-text").innerText = message;
+    }
+   
 }
 
 function animate() {
