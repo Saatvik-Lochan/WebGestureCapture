@@ -14,7 +14,7 @@ function getFormDataFrom(gestureLocator: GestureLocator) {
     return formData
 }
 
-async function startHandGestureTransfer(gestureLocator: GestureLocator) {
+export async function startHandGestureTransfer(gestureLocator: GestureLocator) {
     const formData = getFormDataFrom(gestureLocator);
 
     return await fetch(
@@ -25,7 +25,7 @@ async function startHandGestureTransfer(gestureLocator: GestureLocator) {
     );
 }
 
-async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
+export async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
     const formData = addBufferToFormData(data, getFormDataFrom(gestureLocator));
 
     const response = await fetch(
@@ -42,7 +42,7 @@ async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLo
 }
 
 // handles sending the data with a POST request
-async function sendData(data: object, route = "", method="POST") {
+export async function sendData(data: object, route = "", method="POST") {
     return await fetch(`${backend_url}/${route}`, {
         method,
         body: JSON.stringify(data),
@@ -53,7 +53,7 @@ async function sendData(data: object, route = "", method="POST") {
     })
 }
 
-async function getNextTrial(project_name: string, participant_id: string) {
+export async function getNextTrial(project_name: string, participant_id: string) {
     const response = await fetch(
         `${backend_url}/trial/next-trial/${project_name}/${participant_id}`, {
             method: 'GET',
@@ -63,7 +63,7 @@ async function getNextTrial(project_name: string, participant_id: string) {
     return response
 }
 
-async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
+export async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
             method: 'POST',
@@ -72,7 +72,7 @@ async function completeTrial(trial_id: string, project_name: string, participant
 }
 
 // http requests for demonstration
-async function startDemonstrationTransfer(shortCode: string) {
+export async function startDemonstrationTransfer(shortCode: string) {
     const result = await fetch(`${backend_url}/demonstration/start-transfer/${shortCode}`, {
         method: "POST",
     })
@@ -80,7 +80,7 @@ async function startDemonstrationTransfer(shortCode: string) {
     return result.status == 201;
 }
 
-async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
+export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
     const formData = addBufferToFormData(data, new FormData());
 
     const response = await fetch(
@@ -95,5 +95,3 @@ async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
 
     return response;
 }
-
-export { sendData, sendHandGestureBatch, backend_url, startHandGestureTransfer, getNextTrial, completeTrial}
