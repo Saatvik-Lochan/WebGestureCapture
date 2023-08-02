@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build src",
+    "preview": "vite preview src"
   },
   "dependencies": {
     "@types/three": "^0.152.1",
@@ -10,6 +10,7 @@
     "three": "^0.154.0"
   },
   "devDependencies": {
+    "@types/node": "^20.4.5",
     "typescript": "^5.1.6",
     "vite": "^4.3.9"
   }
