@@ -1,6 +1,6 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./main";
-import { sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
+import { sendDemonstrationBatch, sendHandGestureBatch, startDemonstrationTransfer, startHandGestureTransfer } from "./http_handler";
 
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	const arrayData = getHandDataAsArray(renderer, clock);
@@ -80,10 +80,22 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	return capturedData.flat();
 }
 
-async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator,
-		blockSize: number = 1000) {
+export async function streamHandDataDemonstration(durationMs: number, renderer: WebGLRenderer, shortCode: string) {
+	const sendFcn = (buffer: ArrayBuffer) => sendDemonstrationBatch(buffer, shortCode);
 
+	await streamHandData(durationMs, renderer, sendFcn);
+}
+
+export async function startAndStreamHandDataToMain(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator) {
+	const sendFcn = (buffer: ArrayBuffer) => sendHandGestureBatch(buffer, gestureLocator);
+		
 	await startHandGestureTransfer(gestureLocator);
+	await streamHandData(durationMs, renderer, sendFcn);
+}
+
+async function streamHandData(durationMs: number, renderer: WebGLRenderer,
+		sendFcn: (buffer: ArrayBuffer) => any, blockSize: number = 1000) {
+
 	console.log("stream hand data called");
 	const clock = new Clock(true);
 	let capturedData: number[][] = [];
@@ -94,7 +106,6 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestu
 
 			if (capturedData.length > blockSize) {
 				sendCaptured();
-				capturedData = [];
 			}
 		}
 
@@ -104,8 +115,7 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer, gestu
 
 	function sendCaptured() {
 		const dataAsFloatArr = new Float32Array(capturedData.flat());
-		sendHandGestureBatch(dataAsFloatArr.buffer, gestureLocator);
+		sendFcn(dataAsFloatArr.buffer);
+		capturedData = [];
 	}
 }
-
-export { captureHandSequence, streamHandData };

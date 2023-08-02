@@ -1,6 +1,6 @@
 import { Camera, WebGLRenderer } from "three";
 import { loadBeep, playBeep } from "./audio";
-import { streamHandData } from "./hand_capture";
+import { startAndStreamHandDataToMain } from "./hand_capture";
 import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { audio } from "./main";
 import { completeTrial } from "./http_handler";
@@ -69,7 +69,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
-        streamHandData(durationMs, renderer, gestureLocator),
+        startAndStreamHandDataToMain(durationMs, renderer, gestureLocator),
         displayString(`recording gesture for ${gesture.duration}s`, durationMs, scene, new Style(0.5, 0, 0))
     ]);
 
