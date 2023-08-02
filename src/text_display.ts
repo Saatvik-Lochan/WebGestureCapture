@@ -27,26 +27,26 @@ type TextGroup = Text[];
 
 type TextInstance = {
     textGroup: TextGroup;
-    duration: number;
+    durationMs: number;
 }
 
 type TextSequence = TextInstance[];
 
 // useful shortcuts
-function displayString(str: string, duration: number, scene: Scene, 
-    style: Style={size: 1, xpos: 0, ypos: 0}) {
+function displayString(str: string, durationMs: number, scene: Scene, 
+    style: Style={size: 0.5, xpos: 0, ypos: 0}) {
 
-    return displayTextSequence([{textGroup: [{text: str, style: style}], duration }], scene);
+    return displayTextSequence([{textGroup: [{text: str, style: style}], durationMs }], scene);
 }
 
 function displayStringIndefinitely(text: string, scene: Scene, 
-    style: Style={size: 1, xpos: 0, ypos: 0}) {
+    style: Style={size: 0.5, xpos: 0, ypos: 0}) {
 
     return displayIndefinitely([{text, style}], scene);
 }
 
 function displayForReadableTime(str: string, scene: Scene,
-    style: Style={size: 1, xpos: 0, ypos: 0}) {
+    style: Style={size: 0.5, xpos: 0, ypos: 0}) {
 
     return displayString(str, getReadTime(), scene);
 
@@ -88,7 +88,7 @@ async function displayTextSequence(textSequence: TextSequence, scene: Scene) {
     }
 
     for (let textInstance of textSequence) {
-        let durationPromise = new Promise((resolve) => setTimeout(resolve, textInstance.duration));
+        let durationPromise = new Promise((resolve) => setTimeout(resolve, textInstance.durationMs));
         updateTextTo(textInstance.textGroup);
         await durationPromise;
     }
@@ -104,7 +104,7 @@ async function countDown(
 
     const textSequence = Array.from({ length: countFrom }, (_, i) => {
         let num = countFrom - i;
-        return {textGroup: [{text: num.toString(), style: style}], duration: 1000};
+        return {textGroup: [{text: num.toString(), style: style}], durationMs: 1000};
     });
 
     await displayTextSequence(textSequence, scene);

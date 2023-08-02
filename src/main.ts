@@ -145,4 +145,4 @@ function animate() {
 }
 
 export { frameListeners, project, participant, audio, hands };
-export { initScene, animate, renderer };
+export { initScene, animate, renderer, scene };
