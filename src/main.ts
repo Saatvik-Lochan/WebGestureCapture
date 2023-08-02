@@ -15,7 +15,6 @@ let project: string;
 let participant: string;
 
 main();
-// main();
 
 async function test() {
     await initScene();
