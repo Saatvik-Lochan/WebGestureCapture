@@ -10,7 +10,7 @@ let camera: THREE.PerspectiveCamera;
 let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
-let frameListeners: { [key: string]: () => any } = {};
+let frameListeners: Record<string, () => any>;
 let project: string;
 let participant: string;
 
@@ -145,3 +145,4 @@ function animate() {
 }
 
 export { frameListeners, project, participant, audio, hands };
+export { initScene, animate, renderer };
