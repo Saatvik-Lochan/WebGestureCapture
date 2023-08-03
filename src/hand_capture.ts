@@ -82,7 +82,6 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 
 export async function streamHandDataDemonstration(durationMs: number, renderer: WebGLRenderer, shortCode: string) {
 	const sendFcn = (buffer: ArrayBuffer) => sendDemonstrationBatch(buffer, shortCode);
-
 	await streamHandData(durationMs, renderer, sendFcn);
 }
 

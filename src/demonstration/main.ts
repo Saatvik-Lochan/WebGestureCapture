@@ -1,11 +1,16 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { startDemonstrationTransfer } from "../http_handler";
+import { getDemonstration, startDemonstrationTransfer } from "../http_handler";
 import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
 import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
 
-main();
+// main();
+test();
+
+async function test() {
+    getDemonstration("project", "test");
+}
 
 async function main() {
     await initScene();

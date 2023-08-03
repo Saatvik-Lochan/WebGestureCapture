@@ -95,3 +95,32 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
 
     return response;
 }
+
+export async function getDemonstration(project_name: string, gesture_name: string) {
+    const response = await fetch(
+        `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_name}`, {
+            method: 'GET',
+        }
+    );
+
+    let allData = [];
+    const textDecoder = new TextDecoder('utf8');
+    const reader = response.body.getReader();
+
+    for(;;) {
+        const { value: chunk, done: readerDone } = await reader.read();
+        
+        if (readerDone) break;
+
+        allData = allData.concat(processChunk(chunk)); 
+    }
+
+    console.log(allData);
+    return allData
+
+    function processChunk(chunk: Uint8Array) {
+        const text = textDecoder.decode(chunk);
+        const array = text.split(","); 
+        return array;
+    }
+}
