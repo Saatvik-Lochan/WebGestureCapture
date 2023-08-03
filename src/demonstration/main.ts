@@ -34,7 +34,7 @@ async function testInit(data) {
     renderer.xr.addEventListener('sessionstart', async () => {
         getHandsFrameFromData(data, 0);
     });
-    renderer.xr.addEventListener('sessionend', () => location.reload());
+    // renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
 async function initDemonstration(): Promise<any> {
