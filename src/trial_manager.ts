@@ -2,7 +2,7 @@ import { Camera, WebGLRenderer } from "three";
 import { loadBeep, playBeep } from "./audio";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
-import { audio } from "./main";
+import { audio } from "./init";
 import { completeTrial } from "./http_handler";
 import { createInteractBox } from "./interact";
 import { send } from "vite";

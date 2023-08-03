@@ -1,4 +1,4 @@
-const backend_url = "https://gesturelogger.com:8000";
+export const backend_url = "https://gesturelogger.com:8000";
 
 function addBufferToFormData(buffer: ArrayBuffer, formData: FormData) {
     formData.append('data', new Blob([buffer]));

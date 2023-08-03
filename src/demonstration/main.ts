@@ -1,10 +1,11 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { startDemonstrationTransfer } from "../http_handler";
-import { initScene, animate, renderer, scene } from "../main";
+import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
-import { displayString, displayStringIndefinitely } from "../text_display";
+import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
 
+main();
 
 async function main() {
     await initScene();
@@ -12,17 +13,28 @@ async function main() {
     animate();
 }
 
+function setMainText(text: string) {
+    document.getElementById("instruction-text").innerText = text;
+}
+
 async function initDemonstration(): Promise<any> {
     const urlParams = new URLSearchParams(window.location.search);
     const shortCode = urlParams.get('code');
     const durationMs = parseFloat(urlParams.get('durationMs')); 
+
+    await loadFont();
+
+    if (!shortCode || !durationMs) {
+        setMainText("Both code and durationMs must be provided")
+        return;
+    }
 
     const shortCodeValid = await startDemonstrationTransfer(shortCode);
 
     if (!shortCodeValid)
         return document.getElementById("instruction-text").innerText = "Invalid code";
 
-    document.getElementById("instruction-text").innerText = "Press 'Enter VR' to start";
+    setMainText("Press 'Enter VR' to start");
     document.body.appendChild(VRButton.createButton(renderer));
 
     renderer.xr.addEventListener('sessionstart', async () => await startDemonstrationRecording(shortCode, durationMs));

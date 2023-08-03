@@ -1,5 +1,5 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
-import { frameListeners } from "./main";
+import { frameListeners } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startDemonstrationTransfer, startHandGestureTransfer } from "./http_handler";
 
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
