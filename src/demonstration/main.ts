@@ -3,7 +3,7 @@ import { startDemonstrationTransfer } from "../http_handler";
 import { initScene, animate, renderer, scene } from "../main";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
-import { Style, displayIndefinitely, displayString, displayStringIndefinitely } from "../text_display";
+import { displayString, displayStringIndefinitely } from "../text_display";
 
 
 async function main() {
