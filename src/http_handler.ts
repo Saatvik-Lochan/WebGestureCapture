@@ -103,7 +103,7 @@ export async function getDemonstration(project_name: string, gesture_name: strin
         }
     );
 
-    let allData = [];
+    let allData: number[] = [];
     const textDecoder = new TextDecoder('utf8');
     const reader = response.body.getReader();
 
@@ -120,7 +120,7 @@ export async function getDemonstration(project_name: string, gesture_name: strin
 
     function processChunk(chunk: Uint8Array) {
         const text = textDecoder.decode(chunk);
-        const array = text.split(","); 
+        const array = text.split(",").map((str) => parseFloat(str)); 
         return array;
     }
 }

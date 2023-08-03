@@ -2,6 +2,34 @@ import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startDemonstrationTransfer, startHandGestureTransfer } from "./http_handler";
 
+export const indexToJointName = [
+	'wrist',
+	'thumb-metacarpal',
+	'thumb-phalanx-proximal',
+	'thumb-phalanx-distal',
+	'thumb-tip',
+	'index-finger-metacarpal',
+	'index-finger-phalanx-proximal',
+	'index-finger-phalanx-intermediate',
+	'index-finger-phalanx-distal',
+	'index-finger-tip',
+	'middle-finger-metacarpal',
+	'middle-finger-phalanx-proximal',
+	'middle-finger-phalanx-intermediate',
+	'middle-finger-phalanx-distal',
+	'middle-finger-tip',
+	'ring-finger-metacarpal',
+	'ring-finger-phalanx-proximal',
+	'ring-finger-phalanx-intermediate',
+	'ring-finger-phalanx-distal',
+	'ring-finger-tip',
+	'pinky-finger-metacarpal',
+	'pinky-finger-phalanx-proximal',
+	'pinky-finger-phalanx-intermediate',
+	'pinky-finger-phalanx-distal',
+	'pinky-finger-tip'
+];
+
 function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 	const arrayData = getHandDataAsArray(renderer, clock);
 	const stringData = arrayData.map(element => element.toFixed(6)).join(",")
@@ -12,34 +40,6 @@ function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
 function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
 	const hand0 = renderer.xr.getHand(0);
 	const hand1 = renderer.xr.getHand(1);
-
-	const indexToName = [
-		'wrist',
-		'thumb-metacarpal',
-		'thumb-phalanx-proximal',
-		'thumb-phalanx-distal',
-		'thumb-tip',
-		'index-finger-metacarpal',
-		'index-finger-phalanx-proximal',
-		'index-finger-phalanx-intermediate',
-		'index-finger-phalanx-distal',
-		'index-finger-tip',
-		'middle-finger-metacarpal',
-		'middle-finger-phalanx-proximal',
-		'middle-finger-phalanx-intermediate',
-		'middle-finger-phalanx-distal',
-		'middle-finger-tip',
-		'ring-finger-metacarpal',
-		'ring-finger-phalanx-proximal',
-		'ring-finger-phalanx-intermediate',
-		'ring-finger-phalanx-distal',
-		'ring-finger-tip',
-		'pinky-finger-metacarpal',
-		'pinky-finger-phalanx-proximal',
-		'pinky-finger-phalanx-intermediate',
-		'pinky-finger-phalanx-distal',
-		'pinky-finger-tip'
-	];
 
 	function getJointAsArr(handObj: XRHandSpace, jointName: string) {
 		const poseArray = 
@@ -52,7 +52,7 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
 	function getHandAsArray(handObj: XRHandSpace) {
 		let out_arr = [];
 		for (let i = 0; i <= 24; i++) {
-			out_arr = [...out_arr, ...getJointAsArr(handObj, indexToName[i])];
+			out_arr = [...out_arr, ...getJointAsArr(handObj, indexToJointName[i])];
 		}
 		return out_arr
 	}

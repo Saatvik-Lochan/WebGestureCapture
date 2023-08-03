@@ -4,12 +4,18 @@ import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
 import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
+import { getHandsFrameFromData } from "./demonstrate_gesture";
 
 // main();
 test();
 
 async function test() {
-    getDemonstration("project", "test");
+    await initScene();
+
+    const data = await getDemonstration("project", "test");
+    testInit(data);
+
+    animate();
 }
 
 async function main() {
@@ -20,6 +26,15 @@ async function main() {
 
 function setMainText(text: string) {
     document.getElementById("instruction-text").innerText = text;
+}
+
+async function testInit(data) {
+    setMainText("Press 'Enter VR' to start");
+    document.body.appendChild(VRButton.createButton(renderer));
+    renderer.xr.addEventListener('sessionstart', async () => {
+        getHandsFrameFromData(data, 0);
+    });
+    renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
 async function initDemonstration(): Promise<any> {
