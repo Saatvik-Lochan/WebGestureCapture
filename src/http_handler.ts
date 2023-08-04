@@ -103,6 +103,8 @@ export async function getDemonstration(project_name: string, gesture_name: strin
         }
     );
 
+    if (response.status != 200) return null;
+
     const textDecoder = new TextDecoder('utf8');
     const reader = response.body.getReader();
     let allText = "";

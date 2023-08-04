@@ -41,14 +41,18 @@ export class GestureDemonstration {
     translation = new Matrix4().makeTranslation(0, 0, -0.5);
     hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
 
-    constructor( name: string, data: number[] ) {
+    constructor( name: string ) {
         this.name = name;
+        this.hands = addBothGhostHands();
+        Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
+    }
+
+    load(data: number[]) {
+        this.stopPlayback();
+
         this.data = data;
         this.frames = getFrames(data);
-        this.hands = addBothGhostHands();
         this.currentFrame = 0;
-
-        Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
     }
 
     startPlaybackLoop() {
@@ -72,6 +76,8 @@ export class GestureDemonstration {
         this.currentFrame = frame;
         setHandsToFrame(this.currentFrame, this.data, this.hands.leftHand, this.hands.rightHand);
     } 
+
+
 }
 
 function getNewHand() {

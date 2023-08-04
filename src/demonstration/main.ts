@@ -77,6 +77,7 @@ Refresh the page to redo.
 Close the tab to accept`, scene);
         
     const data = await getDemonstration(locator.project_name, locator.gesture_name);
-    const demonstration = new GestureDemonstration("test", data);
+    const demonstration = new GestureDemonstration("test");
+    demonstration.load(data);
     demonstration.startPlaybackLoop();
 }

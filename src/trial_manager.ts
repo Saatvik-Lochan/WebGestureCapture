@@ -2,10 +2,11 @@ import { Camera, WebGLRenderer } from "three";
 import { loadBeep, playBeep } from "./audio";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
-import { audio } from "./init";
-import { completeTrial } from "./http_handler";
+import { audio, project } from "./init";
+import { completeTrial, getDemonstration } from "./http_handler";
 import { createInteractBox } from "./interact";
 import { send } from "vite";
+import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
 
 export async function displaySkipableInstruction(
     instruction: string, 
@@ -36,13 +37,16 @@ export async function performTrial(
         "Remove your hands to continue",
         scene);
 
+    const demonstration = new GestureDemonstration(trialToPerform.trial_name);
+
     for (let i = 0; i < trialToPerform.gestures.length; i++) {
         const gestureToPerform = trialToPerform.gestures[i];
         await performGesture(
             gestureToPerform,
             getGestureLocator(i),
             scene,
-            renderer
+            renderer,
+            demonstration
         )
     }
 
@@ -60,12 +64,26 @@ export async function performTrial(
     await renderer.xr.getSession().end();
 }
 
-async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
+async function startDemonstrationIfExists(project_name: string, gesture_name: string, demonstration: GestureDemonstration) {
+    const demonstrationData = await getDemonstration(project_name, gesture_name);
+
+    if (demonstrationData) {
+        demonstration.load(demonstrationData)
+        demonstration.startPlaybackLoop();
+    }
+}
+
+async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer,        demonstration: GestureDemonstration) {
+
+    startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_name, demonstration);
+
     await displaySkipableInstruction(
         gesture.instruction, 
         "Place your hands in the box when ready",
         "Remove your hands to start recording",
         scene);
+
+    demonstration.stopPlayback();
 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
