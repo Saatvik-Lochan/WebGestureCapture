@@ -1,5 +1,5 @@
 import { Group, Object3D, XRHandSpace, XRJointSpace } from "three";
-import { scene } from "../init";
+import { frameListeners, scene } from "../init";
 import { indexToJointName } from "../hand_capture";
 import { XRHandModel } from "three/examples/jsm/webxr/XRHandModelFactory";
 import { XRHandMeshModel } from "three/examples/jsm/webxr/XRHandMeshModel";
@@ -33,9 +33,47 @@ class GhostHandModel extends Object3D {
 
 }
 
+export class GestureDemonstration {
+
+    name: string
+    data: number[]
+    frames: number
+    currentFrame: number
+    hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
+
+    constructor( name: string, data: number[] ) {
+        this.name = name;
+        this.data = data;
+        this.frames = getFrames(data);
+        this.hands = addBothGhostHands();
+        this.currentFrame = 0;
+    }
+
+    startPlaybackLoop() {
+        frameListeners[this.name] = () => this.nextFrame();
+    }
+
+    stopPlayback() {
+        delete frameListeners[this.name];
+    }
+
+    nextFrame() {
+        const nextFrame = (this.currentFrame + 1) % this.frames;
+        this.updateToFrame(nextFrame);
+    }
+
+    updateToFrame( frame: number ) {
+        if (frame < 0 || this.frames <= frame) return;
+
+        this.currentFrame = frame;
+        setHandsToFrame(this.currentFrame, this.data, this.hands.leftHand, this.hands.rightHand);
+    } 
+}
+
 function getNewHand() {
     const hand = new Group() as XRHandSpace;
     hand.visible = true;
+    hand.matrixAutoUpdate = false;
 
     // @ts-ignore
     hand.joints = {};     
@@ -55,42 +93,47 @@ function getNewHand() {
 
         const joint = new Group() as XRJointSpace;
         joint.visible = true;
+        joint.matrixAutoUpdate = false;
 
         hand.joints[ jointName ] = joint;
         hand.add(joint);
     }
 }
 
-function getHandsFrameFromData(data: number[], startIndex: number) {
-    const hand1 = getNewHand();
-    populateHand(hand1, startIndex);
-    
-    scene.add(hand1);
-
-    
-    const handModel = new GhostHandModel(hand1);
-    const primitiveModel = new XRHandMeshModel(handModel, hand1, null, "left");
-    handModel.motionController = primitiveModel;
-
-    hand1.add(handModel);
-    
-    console.log('%cdemonstrate_gesture.ts line:46 handModel', 'color: #007acc;', handModel);
-    console.log('%cdemonstrate_gesture.ts line:47 hand1', 'color: #007acc;', hand1);
-
-    
-    function populateHand(hand: XRHandSpace, handStartIndex: number) {
-        const joints = Object.values(hand.joints);
-        
-        for (let jointIndex = 0; jointIndex <= 24; jointIndex++) {
-            const jointStartIndex = handStartIndex + jointIndex * 7;
-            populateJoint(joints[jointIndex], jointStartIndex);
-        }
-
-        function populateJoint(joint: XRJointSpace, jointStartIndex: number) {
-            joint.position.fromArray(data, jointStartIndex);
-            joint.quaternion.fromArray(data, jointStartIndex + 3);
-        }
-    }
+function setHandsToFrame(frame, data, leftHand, rightHand) {
+    populateHandFromIndex(leftHand, data, frame * 352);
+    populateHandFromIndex(rightHand, data, frame * 352 + 175);
 }
 
-export { getHandsFrameFromData };
+function getFrames(data: number[]) {
+    return Math.floor(data.length / 352);
+}
+
+export function addBothGhostHands() {
+    return { leftHand: addGhostHand("left"), rightHand: addGhostHand("right") }
+}
+
+function addGhostHand(handedness: "left" | "right") {
+    const hand = getNewHand();
+    const handModel = new GhostHandModel(hand);
+    const primitiveModel = new XRHandMeshModel(handModel, hand, null, handedness);
+    handModel.motionController = primitiveModel;
+    
+    hand.add(handModel);
+    scene.add(hand);
+    return hand
+}
+
+function populateHandFromIndex(hand: XRHandSpace, data: number[], handStartIndex: number) {
+    const joints = Object.values(hand.joints);
+    
+    for (let jointIndex = 0; jointIndex <= 24; jointIndex++) {
+        const jointStartIndex = handStartIndex + jointIndex * 7;
+        populateJoint(joints[jointIndex], jointStartIndex);
+    }
+
+    function populateJoint(joint: XRJointSpace, jointStartIndex: number) {
+        joint.position.fromArray(data, jointStartIndex);
+        joint.quaternion.fromArray(data, jointStartIndex + 3);
+    }
+}

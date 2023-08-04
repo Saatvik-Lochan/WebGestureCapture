@@ -4,7 +4,7 @@ import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
 import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
-import { getHandsFrameFromData } from "./demonstrate_gesture";
+import { GestureDemonstration } from "./demonstrate_gesture";
 
 // main();
 test();
@@ -13,6 +13,8 @@ async function test() {
     await initScene();
 
     const data = await getDemonstration("project", "test");
+    const demonstration = new GestureDemonstration("test", data);
+    demonstration.startPlaybackLoop();
     testInit(data);
 
     animate();
@@ -32,7 +34,6 @@ async function testInit(data) {
     setMainText("Press 'Enter VR' to start");
     document.body.appendChild(VRButton.createButton(renderer));
     renderer.xr.addEventListener('sessionstart', async () => {
-        getHandsFrameFromData(data, 0);
     });
     // renderer.xr.addEventListener('sessionend', () => location.reload());
 }

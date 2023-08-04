@@ -103,24 +103,17 @@ export async function getDemonstration(project_name: string, gesture_name: strin
         }
     );
 
-    let allData: number[] = [];
     const textDecoder = new TextDecoder('utf8');
     const reader = response.body.getReader();
+    let allText = "";
 
     for(;;) {
         const { value: chunk, done: readerDone } = await reader.read();
         
         if (readerDone) break;
 
-        allData = allData.concat(processChunk(chunk)); 
+        allText = allText + textDecoder.decode(chunk);
     }
 
-    console.log(allData);
-    return allData
-
-    function processChunk(chunk: Uint8Array) {
-        const text = textDecoder.decode(chunk);
-        const array = text.split(",").map((str) => parseFloat(str)); 
-        return array;
-    }
+    return allText.split("\n").map(line => line.split(",").map(parseFloat)).flat();
 }
