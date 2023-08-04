@@ -1,4 +1,4 @@
-import { Group, Object3D, XRHandSpace, XRJointSpace } from "three";
+import { Group, Matrix4, Object3D, XRHandSpace, XRJointSpace } from "three";
 import { frameListeners, scene } from "../init";
 import { indexToJointName } from "../hand_capture";
 import { XRHandMeshModel } from "three/examples/jsm/webxr/XRHandMeshModel";
@@ -38,6 +38,7 @@ export class GestureDemonstration {
     data: number[]
     frames: number
     currentFrame: number
+    translation = new Matrix4().makeTranslation(0, 0, -0.5);
     hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
 
     constructor( name: string, data: number[] ) {
@@ -46,13 +47,17 @@ export class GestureDemonstration {
         this.frames = getFrames(data);
         this.hands = addBothGhostHands();
         this.currentFrame = 0;
+
+        Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
     }
 
     startPlaybackLoop() {
+        Object.values(this.hands).forEach(hand => hand.visible = true);
         frameListeners[this.name] = () => this.nextFrame();
     }
 
     stopPlayback() {
+        Object.values(this.hands).forEach(hand => hand.visible = false);
         delete frameListeners[this.name];
     }
 

@@ -6,17 +6,12 @@ import { streamHandDataDemonstration } from "../hand_capture";
 import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
 import { GestureDemonstration } from "./demonstrate_gesture";
 
-// main();
-test();
+main();
+// test();
 
 async function test() {
     await initScene();
-
-    const data = await getDemonstration("project", "test");
-    const demonstration = new GestureDemonstration("test", data);
-    demonstration.startPlaybackLoop();
-    testInit(data);
-
+    
     animate();
 }
 
@@ -33,9 +28,8 @@ function setMainText(text: string) {
 async function testInit(data) {
     setMainText("Press 'Enter VR' to start");
     document.body.appendChild(VRButton.createButton(renderer));
-    renderer.xr.addEventListener('sessionstart', async () => {
-    });
-    // renderer.xr.addEventListener('sessionend', () => location.reload());
+    renderer.xr.addEventListener('sessionstart', async () => {});
+    renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
 async function initDemonstration(): Promise<any> {
@@ -50,7 +44,7 @@ async function initDemonstration(): Promise<any> {
         return;
     }
 
-    const shortCodeValid = await startDemonstrationTransfer(shortCode);
+    const { status: shortCodeValid, locator } = await startDemonstrationTransfer(shortCode);
 
     if (!shortCodeValid)
         return document.getElementById("instruction-text").innerText = "Invalid code";
@@ -58,13 +52,14 @@ async function initDemonstration(): Promise<any> {
     setMainText("Press 'Enter VR' to start");
     document.body.appendChild(VRButton.createButton(renderer));
 
-    renderer.xr.addEventListener('sessionstart', async () => await startDemonstrationRecording(shortCode, durationMs));
+    renderer.xr.addEventListener('sessionstart', async () => await startDemonstrationRecording(shortCode, durationMs, locator));
     renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
-async function startDemonstrationRecording(shortCode: string, durationMs: number) {
+async function startDemonstrationRecording(shortCode: string, durationMs: number, locator) {
     await displaySkipableInstruction(
-        "You are about to record a gesture demonstration.\nPut your hands in the box and follow the instructions",
+        `About to record gesture ${locator.gesture_name} for ${locator.project_name}.
+Put your hands in the box and follow the instructions`,
         "Place your whole hands in the box",
         "Remove your hands to start recording",
         scene);
@@ -76,5 +71,12 @@ async function startDemonstrationRecording(shortCode: string, durationMs: number
             scene)
     ]);
 
-    displayStringIndefinitely("Finished", scene);
+    displayStringIndefinitely(
+        `This is the recorded geture ${locator.gesture_name}
+Refresh the page to redo.
+Close the tab to accept`, scene);
+        
+    const data = await getDemonstration(locator.project_name, locator.gesture_name);
+    const demonstration = new GestureDemonstration("test", data);
+    demonstration.startPlaybackLoop();
 }

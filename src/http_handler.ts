@@ -77,7 +77,7 @@ export async function startDemonstrationTransfer(shortCode: string) {
         method: "POST",
     })
 
-    return result.status == 201;
+    return {status: result.status == 201, locator: await result.json() };
 }
 
 export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
