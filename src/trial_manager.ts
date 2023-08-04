@@ -27,7 +27,7 @@ export async function performTrial(
     project_name: string, 
     participant_id: string) 
     {
-    await Promise.all([loadFont(), loadBeep()]);
+    await loadFont();
     console.log("trial started");
     await displaySkipableInstruction(
         trialToPerform.instructions, 
@@ -65,9 +65,13 @@ export async function performTrial(
 async function startDemonstrationIfExists(project_name: string, gesture_name: string, demonstration: GestureDemonstration) {
     const demonstrationData = await getDemonstration(project_name, gesture_name);
 
+    console.log('%ctrial_manager.ts line:68 gesture_name', 'color: #007acc;', gesture_name);
+    console.log('%ctrial_manager.ts line:69 project_name', 'color: #007acc;', project_name);
+
     if (demonstrationData) {
         demonstration.load(demonstrationData)
         demonstration.startPlaybackLoop();
+        console.log("demonstration started");
     }
 }
 

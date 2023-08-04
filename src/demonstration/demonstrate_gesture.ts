@@ -113,6 +113,7 @@ function getNewHand() {
 function setHandsToFrame(frame, data, leftHand, rightHand) {
     populateHandFromIndex(leftHand, data, frame * 352);
     populateHandFromIndex(rightHand, data, frame * 352 + 175);
+    console.log('%cdemonstrate_gesture.ts line:116 data.slice(0, 352)', 'color: #007acc;', data.slice(0, 352));
 }
 
 function getFrames(data: number[]) {
@@ -129,8 +130,11 @@ function addGhostHand(handedness: "left" | "right") {
     const primitiveModel = new XRHandMeshModel(handModel, hand, null, handedness);
     handModel.motionController = primitiveModel;
     
+    // hand.visible = false;
+
     hand.add(handModel);
     scene.add(hand);
+
     return hand
 }
 
