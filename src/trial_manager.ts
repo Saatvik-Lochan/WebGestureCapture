@@ -1,11 +1,9 @@
-import { Camera, WebGLRenderer } from "three";
-import { loadBeep, playBeep } from "./audio";
+import { WebGLRenderer } from "three";
+import { loadBeep } from "./audio";
 import { startAndStreamHandDataToMain } from "./hand_capture";
-import { Style, clearDisplayIndefinitely, countDown, displayForReadableTime, displayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
-import { audio, project } from "./init";
+import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
 import { createInteractBox } from "./interact";
-import { send } from "vite";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
 
 export async function displaySkipableInstruction(
