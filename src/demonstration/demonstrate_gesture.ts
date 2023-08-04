@@ -1,7 +1,6 @@
 import { Group, Object3D, XRHandSpace, XRJointSpace } from "three";
 import { frameListeners, scene } from "../init";
 import { indexToJointName } from "../hand_capture";
-import { XRHandModel } from "three/examples/jsm/webxr/XRHandModelFactory";
 import { XRHandMeshModel } from "three/examples/jsm/webxr/XRHandMeshModel";
 import { XRHandPrimitiveModel } from "three/examples/jsm/webxr/XRHandPrimitiveModel";
 
