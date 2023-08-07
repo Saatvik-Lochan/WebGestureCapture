@@ -1,5 +1,10 @@
 export const backend_url = "https://gesturelogger.com:8000";
 
+export interface GestureClassLocator {
+    project_name: string;
+    gesture_id: string;
+}
+
 function addBufferToFormData(buffer: ArrayBuffer, formData: FormData) {
     formData.append('data', new Blob([buffer]));
     return formData
@@ -96,9 +101,9 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
     return response;
 }
 
-export async function getDemonstration(project_name: string, gesture_name: string) {
+export async function getDemonstration(project_name: string, gesture_id: string) {
     const response = await fetch(
-        `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_name}`, {
+        `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_id}`, {
             method: 'GET',
         }
     );

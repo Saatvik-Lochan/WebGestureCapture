@@ -1,5 +1,5 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { getDemonstration, startDemonstrationTransfer } from "../http_handler";
+import { GestureClassLocator, getDemonstration, startDemonstrationTransfer } from "../http_handler";
 import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
@@ -56,9 +56,9 @@ async function initDemonstration(): Promise<any> {
     renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
-async function startDemonstrationRecording(shortCode: string, durationMs: number, locator) {
+async function startDemonstrationRecording(shortCode: string, durationMs: number, locator: GestureClassLocator) {
     await displaySkipableInstruction(
-        `About to record gesture ${locator.gesture_name} for ${locator.project_name}.
+        `About to record gesture with id ${locator.gesture_id} for ${locator.project_name}.
 Put your hands in the box and follow the instructions`,
         "Place your whole hands in the box",
         "Remove your hands to start recording",
@@ -72,11 +72,11 @@ Put your hands in the box and follow the instructions`,
     ]);
 
     displayStringIndefinitely(
-        `This is the recorded geture ${locator.gesture_name}
+        `This is the recorded geture for gesture id: ${locator.gesture_id}
 Refresh the page to redo.
 Close the tab to accept`, scene);
         
-    const data = await getDemonstration(locator.project_name, locator.gesture_name);
+    const data = await getDemonstration(locator.project_name, locator.gesture_id);
     const demonstration = new GestureDemonstration("test");
     demonstration.load(data);
     demonstration.startPlaybackLoop();

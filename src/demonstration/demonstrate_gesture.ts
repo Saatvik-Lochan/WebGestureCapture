@@ -76,8 +76,6 @@ export class GestureDemonstration {
         this.currentFrame = frame;
         setHandsToFrame(this.currentFrame, this.data, this.hands.leftHand, this.hands.rightHand);
     } 
-
-
 }
 
 function getNewHand() {
@@ -110,7 +108,7 @@ function getNewHand() {
     }
 }
 
-function setHandsToFrame(frame, data, leftHand, rightHand) {
+function setHandsToFrame(frame: number, data: number[], leftHand: XRHandSpace, rightHand: XRHandSpace) {
     populateHandFromIndex(leftHand, data, frame * 352);
     populateHandFromIndex(rightHand, data, frame * 352 + 175);
     console.log('%cdemonstrate_gesture.ts line:116 data.slice(0, 352)', 'color: #007acc;', data.slice(0, 352));
