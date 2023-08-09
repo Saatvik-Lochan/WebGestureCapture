@@ -101,6 +101,16 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
     return response;
 }
 
+export async function shortCodeExists(shortCode: string) {
+    const result = await fetch(
+        `${backend_url}/demonstration/shortcode-exists/${shortCode}`, {
+            method: 'GET',
+        }
+    );
+
+    return {status: result.status == 200, locator: await result.json() };
+}
+
 export async function getDemonstration(project_name: string, gesture_id: string) {
     const response = await fetch(
         `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_id}`, {

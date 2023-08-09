@@ -69,6 +69,7 @@ async function startDemonstrationIfExists(project_name: string, gesture_id: stri
     console.log('%ctrial_manager.ts line:69 project_name', 'color: #007acc;', project_name);
 
     if (demonstrationData) {
+        console.log('%ctrial_manager.ts line:72 demonstrationData', 'color: #007acc;', demonstrationData);
         demonstration.load(demonstrationData)
         demonstration.startPlaybackLoop();
         console.log("demonstration started");
@@ -77,7 +78,7 @@ async function startDemonstrationIfExists(project_name: string, gesture_id: stri
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer,        demonstration: GestureDemonstration) {
 
-    startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_name, demonstration);
+    startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
 
     await displaySkipableInstruction(
         gesture.instruction, 

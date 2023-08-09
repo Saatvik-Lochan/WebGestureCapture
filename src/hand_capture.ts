@@ -1,6 +1,6 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
 import { frameListeners } from "./init";
-import { sendDemonstrationBatch, sendHandGestureBatch, startDemonstrationTransfer, startHandGestureTransfer } from "./http_handler";
+import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 export const indexToJointName = [
 	'wrist',

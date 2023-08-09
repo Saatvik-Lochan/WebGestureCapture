@@ -38,7 +38,7 @@ export class GestureDemonstration {
     data: number[]
     frames: number
     currentFrame: number
-    translation = new Matrix4().makeTranslation(0, 0, -0.5);
+    translation = new Matrix4().makeTranslation(0, 0, -1);
     hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
 
     constructor( name: string ) {
@@ -49,6 +49,8 @@ export class GestureDemonstration {
 
     load(data: number[]) {
         this.stopPlayback();
+
+        console.log('%cdemonstrate_gesture.ts line:53 data', 'color: #007acc;', data);
 
         this.data = data;
         this.frames = getFrames(data);
@@ -111,7 +113,6 @@ function getNewHand() {
 function setHandsToFrame(frame: number, data: number[], leftHand: XRHandSpace, rightHand: XRHandSpace) {
     populateHandFromIndex(leftHand, data, frame * 352);
     populateHandFromIndex(rightHand, data, frame * 352 + 175);
-    console.log('%cdemonstrate_gesture.ts line:116 data.slice(0, 352)', 'color: #007acc;', data.slice(0, 352));
 }
 
 function getFrames(data: number[]) {

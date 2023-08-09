@@ -1,5 +1,5 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { GestureClassLocator, getDemonstration, startDemonstrationTransfer } from "../http_handler";
+import { GestureClassLocator, getDemonstration, shortCodeExists, startDemonstrationTransfer } from "../http_handler";
 import { initScene, animate, renderer, scene } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
@@ -44,7 +44,7 @@ async function initDemonstration(): Promise<any> {
         return;
     }
 
-    const { status: shortCodeValid, locator } = await startDemonstrationTransfer(shortCode);
+    const { status: shortCodeValid, locator } = await shortCodeExists(shortCode);
     console.log('%cmain.ts line:48 locator', 'color: #007acc;', locator);
 
     if (!shortCodeValid)
@@ -58,6 +58,8 @@ async function initDemonstration(): Promise<any> {
 }
 
 async function startDemonstrationRecording(shortCode: string, durationMs: number, locator: GestureClassLocator) {
+    await startDemonstrationTransfer(shortCode);
+
     await displaySkipableInstruction(
         `About to record gesture with id ${locator.gesture_id} for ${locator.project_name}.
 Put your hands in the box and follow the instructions`,
@@ -78,7 +80,7 @@ Refresh the page to redo.
 Close the tab to accept`, scene);
         
     const data = await getDemonstration(locator.project_name, locator.gesture_id);
-    const demonstration = new GestureDemonstration("test");
+    const demonstration = new GestureDemonstration("preview");
     demonstration.load(data);
     demonstration.startPlaybackLoop();
 }
