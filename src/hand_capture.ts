@@ -71,8 +71,10 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	const clock = new Clock(true);
 	const capturedData: number[][] = [];
 	
-	frameListeners[0] = 
-		() => capturedData.push(getHandDataAsArray(renderer, clock));
+	frameListeners[0] = {
+		fcn: () => capturedData.push(getHandDataAsArray(renderer, clock)),
+		t: 1
+	}
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[0];
@@ -99,14 +101,17 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer,
 	const clock = new Clock(true);
 	let capturedData: number[][] = [];
 	
-	frameListeners[1] = 
-		() => {
+	frameListeners[1] = {
+		fcn: () => {
 			capturedData.push(getHandDataAsArray(renderer, clock));
 
 			if (capturedData.length > blockSize) {
 				sendCaptured();
 			}
-		}
+		},
+		t: 1
+	}
+		
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[1];

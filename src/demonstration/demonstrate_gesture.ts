@@ -59,7 +59,10 @@ export class GestureDemonstration {
 
     startPlaybackLoop() {
         Object.values(this.hands).forEach(hand => hand.visible = true);
-        frameListeners[this.name] = () => this.nextFrame();
+        frameListeners[this.name] = {
+            fcn: () => this.nextFrame(),
+            t: 1
+        }
     }
 
     stopPlayback() {

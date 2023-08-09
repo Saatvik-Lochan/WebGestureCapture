@@ -10,7 +10,9 @@ let camera: THREE.PerspectiveCamera;
 let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
-let frameListeners: Record<string, () => any> = {};
+
+export type frameListener = {fcn: () => any, t: number, offset?: number};
+let frameListeners: Record<string, frameListener> = {};
 let project: string;
 let participant: string;
 
@@ -130,8 +132,13 @@ async function initProject() {
 }
 
 function animate() {
+
+    let frameNumber = 0;
     renderer.setAnimationLoop(() => {
-        Object.values(frameListeners).forEach((fcn: () => any) => (fcn()));
+        frameNumber = (frameNumber + 1) % 1000000000;
+        Object.values(frameListeners).forEach((frameListener) => {
+            if (frameNumber % frameListener.t == (frameListener.offset ?? 0)) frameListener.fcn();
+        });
         renderer.render(scene, camera);
     });
 }

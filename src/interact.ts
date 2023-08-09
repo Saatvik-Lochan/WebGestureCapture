@@ -54,37 +54,39 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
             updateText(text.enterText);
         }
 
-        const frameThreshold = 50;
+        const timeThreshold = 750;
         let handsInside = false;
         let handsInsideLastFrame = false;
-        let framesInside = 0;
+        let startTime;
         let primed = false;
 
-        frameListeners["button"] = () => {
-            handsInsideLastFrame = handsInside;
-            handsInside = handsInBox(hands, box);
-
-            if (handsInside) {
-                if (handsInsideLastFrame) {
-                    framesInside++;
-
-                    if (framesInside > frameThreshold) {
-                        primed = true;
-                        onPrime();
-                    } 
-                } else {
-                    onHandsFirstEnter();
-                }
-            } else {
-                if (handsInsideLastFrame)  {
-                    if (primed) {
-                        onPress();
+        frameListeners["button"] = {
+            fcn: () => {
+                handsInsideLastFrame = handsInside;
+                handsInside = handsInBox(hands, box);
+    
+                if (handsInside) {
+                    if (handsInsideLastFrame) {
+                        if (startTime && !primed && Date.now() - startTime > timeThreshold) {
+                            primed = true;
+                            onPrime();
+                        } 
                     } else {
-                        onCancel();
+                        startTime = Date.now();
+                        onHandsFirstEnter();
+                    }
+                } else {
+                    if (handsInsideLastFrame)  {
+                        if (primed) {
+                            onPress();
+                        } else {
+                            onCancel();
+                        }
                     }
                 }
-            }
-        };
+            },
+            t: 5
+        }
 
         function onHandsFirstEnter() {
             cube.material = redMaterial;
