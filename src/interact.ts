@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { frameListeners, hands } from "./init";
-import { TextGeometry, TextGeometryParameters } from "three/examples/jsm/geometries/TextGeometry";
+import { TextGeometryParameters } from "three/examples/jsm/geometries/TextGeometry";
 import { Font } from "three/examples/jsm/loaders/FontLoader";
-import { MeshBasicMaterial } from "three";
 import { getCenteredText } from "./text_display";
 
 const greenMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00,  opacity:0.4, transparent:true});
