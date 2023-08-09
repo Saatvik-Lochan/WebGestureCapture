@@ -45,6 +45,7 @@ async function initDemonstration(): Promise<any> {
     }
 
     const { status: shortCodeValid, locator } = await startDemonstrationTransfer(shortCode);
+    console.log('%cmain.ts line:48 locator', 'color: #007acc;', locator);
 
     if (!shortCodeValid)
         return document.getElementById("instruction-text").innerText = "Invalid code";

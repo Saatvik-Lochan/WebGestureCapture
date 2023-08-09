@@ -62,10 +62,10 @@ export async function performTrial(
     await renderer.xr.getSession().end();
 }
 
-async function startDemonstrationIfExists(project_name: string, gesture_name: string, demonstration: GestureDemonstration) {
-    const demonstrationData = await getDemonstration(project_name, gesture_name);
+async function startDemonstrationIfExists(project_name: string, gesture_id: string, demonstration: GestureDemonstration) {
+    const demonstrationData = await getDemonstration(project_name, gesture_id);
 
-    console.log('%ctrial_manager.ts line:68 gesture_name', 'color: #007acc;', gesture_name);
+    console.log('%ctrial_manager.ts line:68 gesture_id', 'color: #007acc;', gesture_id);
     console.log('%ctrial_manager.ts line:69 project_name', 'color: #007acc;', project_name);
 
     if (demonstrationData) {
