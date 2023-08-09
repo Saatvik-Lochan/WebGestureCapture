@@ -11,7 +11,7 @@ main();
 
 async function test() {
     await initScene();
-    
+
     animate();
 }
 
@@ -28,14 +28,14 @@ function setMainText(text: string) {
 async function testInit(data) {
     setMainText("Press 'Enter VR' to start");
     document.body.appendChild(VRButton.createButton(renderer));
-    renderer.xr.addEventListener('sessionstart', async () => {});
+    renderer.xr.addEventListener('sessionstart', async () => { });
     renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 
 async function initDemonstration(): Promise<any> {
     const urlParams = new URLSearchParams(window.location.search);
     const shortCode = urlParams.get('code');
-    const durationMs = parseFloat(urlParams.get('durationMs')); 
+    const durationMs = parseFloat(urlParams.get('durationMs'));
 
     await loadFont();
 
@@ -69,8 +69,8 @@ Put your hands in the box and follow the instructions`,
 
     await Promise.all([
         streamHandDataDemonstration(durationMs, renderer, shortCode),
-        displayString(`recording gesture demonstration for ${durationMs/1000}s`, 
-            durationMs, 
+        displayString(`recording gesture demonstration for ${durationMs / 1000}s`,
+            durationMs,
             scene)
     ]);
 
@@ -78,7 +78,7 @@ Put your hands in the box and follow the instructions`,
         `This is the recorded geture for gesture id: ${locator.gesture_id}
 Refresh the page to redo.
 Close the tab to accept`, scene);
-        
+
     const data = await getDemonstration(locator.project_name, locator.gesture_id);
     const demonstration = new GestureDemonstration("preview");
     demonstration.load(data);

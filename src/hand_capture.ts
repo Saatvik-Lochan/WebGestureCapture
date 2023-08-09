@@ -42,9 +42,9 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
 	const hand1 = renderer.xr.getHand(1);
 
 	function getJointAsArr(handObj: XRHandSpace, jointName: string) {
-		const poseArray = 
+		const poseArray =
 			[...handObj.joints[jointName].position.toArray(),
-			 ...handObj.joints[jointName].quaternion.toArray()];
+			...handObj.joints[jointName].quaternion.toArray()];
 
 		return poseArray;
 	}
@@ -70,7 +70,7 @@ async function captureHandSequence(durationMs: number, renderer: WebGLRenderer) 
 	// setting as 0 for now
 	const clock = new Clock(true);
 	const capturedData: number[][] = [];
-	
+
 	frameListeners[0] = {
 		fcn: () => capturedData.push(getHandDataAsArray(renderer, clock)),
 		t: 1
@@ -89,18 +89,18 @@ export async function streamHandDataDemonstration(durationMs: number, renderer: 
 
 export async function startAndStreamHandDataToMain(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator) {
 	const sendFcn = (buffer: ArrayBuffer) => sendHandGestureBatch(buffer, gestureLocator);
-		
+
 	await startHandGestureTransfer(gestureLocator);
 	await streamHandData(durationMs, renderer, sendFcn);
 }
 
 async function streamHandData(durationMs: number, renderer: WebGLRenderer,
-		sendFcn: (buffer: ArrayBuffer) => any, blockSize: number = 1000) {
+	sendFcn: (buffer: ArrayBuffer) => any, blockSize: number = 1000) {
 
 	console.log("stream hand data called");
 	const clock = new Clock(true);
 	let capturedData: number[][] = [];
-	
+
 	frameListeners[1] = {
 		fcn: () => {
 			capturedData.push(getHandDataAsArray(renderer, clock));
@@ -111,7 +111,7 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer,
 		},
 		t: 1
 	}
-		
+
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[1];

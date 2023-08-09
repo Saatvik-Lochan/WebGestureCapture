@@ -24,9 +24,9 @@ export async function startHandGestureTransfer(gestureLocator: GestureLocator) {
 
     return await fetch(
         `${backend_url}/gesture-data/start-transfer`, {
-            method: 'POST',
-            body: formData
-        }
+        method: 'POST',
+        body: formData
+    }
     );
 }
 
@@ -35,9 +35,9 @@ export async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: Ge
 
     const response = await fetch(
         `${backend_url}/gesture-data/append-data`, {
-            method: 'POST',
-            body: formData
-        }
+        method: 'POST',
+        body: formData
+    }
     );
 
     if (response.status == 201)
@@ -47,7 +47,7 @@ export async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: Ge
 }
 
 // handles sending the data with a POST request
-export async function sendData(data: object, route = "", method="POST") {
+export async function sendData(data: object, route = "", method = "POST") {
     return await fetch(`${backend_url}/${route}`, {
         method,
         body: JSON.stringify(data),
@@ -61,8 +61,8 @@ export async function sendData(data: object, route = "", method="POST") {
 export async function getNextTrial(project_name: string, participant_id: string) {
     const response = await fetch(
         `${backend_url}/trial/next-trial/${project_name}/${participant_id}`, {
-            method: 'GET',
-        }
+        method: 'GET',
+    }
     );
 
     return response
@@ -71,8 +71,8 @@ export async function getNextTrial(project_name: string, participant_id: string)
 export async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
-            method: 'POST',
-        }
+        method: 'POST',
+    }
     );
 }
 
@@ -82,7 +82,7 @@ export async function startDemonstrationTransfer(shortCode: string) {
         method: "POST",
     })
 
-    return {status: result.status == 201, locator: await result.json() };
+    return { status: result.status == 201, locator: await result.json() };
 }
 
 export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
@@ -90,9 +90,9 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
 
     const response = await fetch(
         `${backend_url}/demonstration/append-data/${shortcode}`, {
-            method: 'POST',
-            body: formData
-        }
+        method: 'POST',
+        body: formData
+    }
     );
 
     if (response.status == 201)
@@ -104,18 +104,18 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
 export async function shortCodeExists(shortCode: string) {
     const result = await fetch(
         `${backend_url}/demonstration/shortcode-exists/${shortCode}`, {
-            method: 'GET',
-        }
+        method: 'GET',
+    }
     );
 
-    return {status: result.status == 200, locator: await result.json() };
+    return { status: result.status == 200, locator: await result.json() };
 }
 
 export async function getDemonstration(project_name: string, gesture_id: string) {
     const response = await fetch(
         `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_id}`, {
-            method: 'GET',
-        }
+        method: 'GET',
+    }
     );
 
     if (response.status != 200) return null;
@@ -124,9 +124,9 @@ export async function getDemonstration(project_name: string, gesture_id: string)
     const reader = response.body.getReader();
     let allText = "";
 
-    for(;;) {
+    for (; ;) {
         const { value: chunk, done: readerDone } = await reader.read();
-        
+
         if (readerDone) break;
 
         allText = allText + textDecoder.decode(chunk);

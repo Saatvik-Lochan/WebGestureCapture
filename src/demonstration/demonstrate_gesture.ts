@@ -9,26 +9,26 @@ class GhostHandModel extends Object3D {
     controller: XRHandSpace;
     motionController: XRHandMeshModel | XRHandPrimitiveModel;
 
-	constructor( controller ) {
+    constructor(controller) {
 
-		super();
+        super();
 
-		this.controller = controller;
-		this.motionController = null;
+        this.controller = controller;
+        this.motionController = null;
 
-	}
+    }
 
-	updateMatrixWorld( force: boolean ) {
+    updateMatrixWorld(force: boolean) {
 
-		super.updateMatrixWorld( force );
+        super.updateMatrixWorld(force);
 
-		if ( this.motionController ) {
+        if (this.motionController) {
 
-			this.motionController.updateMesh();
+            this.motionController.updateMesh();
 
-		}
+        }
 
-	}
+    }
 
 }
 
@@ -41,7 +41,7 @@ export class GestureDemonstration {
     translation = new Matrix4().makeTranslation(0, 0, -1);
     hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
 
-    constructor( name: string ) {
+    constructor(name: string) {
         this.name = name;
         this.hands = addBothGhostHands();
         Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
@@ -75,12 +75,12 @@ export class GestureDemonstration {
         this.updateToFrame(nextFrame);
     }
 
-    updateToFrame( frame: number ) {
+    updateToFrame(frame: number) {
         if (frame < 0 || this.frames <= frame) return;
 
         this.currentFrame = frame;
         setHandsToFrame(this.currentFrame, this.data, this.hands.leftHand, this.hands.rightHand);
-    } 
+    }
 }
 
 function getNewHand() {
@@ -89,7 +89,7 @@ function getNewHand() {
     hand.matrixAutoUpdate = false;
 
     // @ts-ignore
-    hand.joints = {};     
+    hand.joints = {};
 
     // @ts-ignore
     hand.inputState = { pinching: false };
@@ -108,7 +108,7 @@ function getNewHand() {
         joint.visible = true;
         joint.matrixAutoUpdate = false;
 
-        hand.joints[ jointName ] = joint;
+        hand.joints[jointName] = joint;
         hand.add(joint);
     }
 }
@@ -131,7 +131,7 @@ function addGhostHand(handedness: "left" | "right") {
     const handModel = new GhostHandModel(hand);
     const primitiveModel = new XRHandMeshModel(handModel, hand, null, handedness);
     handModel.motionController = primitiveModel;
-    
+
     // hand.visible = false;
 
     hand.add(handModel);
@@ -142,7 +142,7 @@ function addGhostHand(handedness: "left" | "right") {
 
 function populateHandFromIndex(hand: XRHandSpace, data: number[], handStartIndex: number) {
     const joints = Object.values(hand.joints);
-    
+
     for (let jointIndex = 0; jointIndex <= 24; jointIndex++) {
         const jointStartIndex = handStartIndex + jointIndex * 7;
         populateJoint(joints[jointIndex], jointStartIndex);

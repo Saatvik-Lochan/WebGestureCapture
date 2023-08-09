@@ -11,7 +11,7 @@ let scene: THREE.Scene;
 let audio: THREE.Audio;
 let hands: THREE.XRHandSpace[]; // hands for handmodels only
 
-export type frameListener = {fcn: () => any, t: number, offset?: number};
+export type frameListener = { fcn: () => any, t: number, offset?: number };
 let frameListeners: Record<string, frameListener> = {};
 let project: string;
 let participant: string;
@@ -49,7 +49,7 @@ async function initScene() {
     initCameraAndScene();
     initAudio();
     initHands();
-    
+
 
     function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -84,7 +84,7 @@ async function initScene() {
         }
 
         hands = [0, 1].map((ele) => initHand(ele, "spheres"));
-    }    
+    }
 }
 
 async function initProject() {
@@ -110,7 +110,7 @@ async function initProject() {
                     renderer.xr.addEventListener('sessionend', () => {
                         location.reload();
                     });
-                    
+
                     break;
                 default:
                     message = await response.text();
@@ -128,7 +128,7 @@ async function initProject() {
     function setText(message: string) {
         document.getElementById("instruction-text").innerText = message;
     }
-   
+
 }
 
 function animate() {
