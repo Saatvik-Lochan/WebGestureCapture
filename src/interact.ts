@@ -4,9 +4,9 @@ import { TextGeometryParameters } from "three/examples/jsm/geometries/TextGeomet
 import { Font } from "three/examples/jsm/loaders/FontLoader";
 import { getCenteredText } from "./text_display";
 
-const greenMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00,  opacity:0.4, transparent:true});
-const redMaterial = new THREE.MeshBasicMaterial( {color: 0xff0000,  opacity:0.4, transparent:true});
-const blueMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff,  opacity:0.1, transparent:true});
+const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.4, transparent: true });
+const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
+const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
 
 type interactText = {
     enterText: string,
@@ -29,25 +29,23 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
 
     return new Promise(resolve => {
         // Create the cube itself
-        const cubeGeom = new THREE.BoxGeometry( 1, 0.4, 1 );
-        const cube = new THREE.Mesh( cubeGeom, blueMaterial );
-    
+        const cubeGeom = new THREE.BoxGeometry(1, 0.4, 1);
+        const cube = new THREE.Mesh(cubeGeom, blueMaterial);
+
         // Also add a wireframe to the cube to better see the depth
-        const _wireframe = new THREE.EdgesGeometry( cubeGeom ); 
-        const wireframe = new THREE.LineSegments( _wireframe);
-    
+        const _wireframe = new THREE.EdgesGeometry(cubeGeom);
+        const wireframe = new THREE.LineSegments(_wireframe);
+
         // Rotate it a little for a better vantage point
         cube.position.set(0, 0.4, -0.1);
         wireframe.position.set(0, 0.4, -0.1);
-    
+
         // add to scene
-        scene.add( cube ) 
-        scene.add( wireframe );
-        
+        scene.add(cube)
+        scene.add(wireframe);
+
         const box = new THREE.Box3();
         box.setFromObject(cube);
-    
-        let wasInBox = false;
 
         if (text) {
             updateText(text.enterText);
@@ -63,19 +61,19 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
             fcn: () => {
                 handsInsideLastFrame = handsInside;
                 handsInside = handsInBox(hands, box);
-    
+
                 if (handsInside) {
                     if (handsInsideLastFrame) {
                         if (startTime && !primed && Date.now() - startTime > timeThreshold) {
                             primed = true;
                             onPrime();
-                        } 
+                        }
                     } else {
                         startTime = Date.now();
                         onHandsFirstEnter();
                     }
                 } else {
-                    if (handsInsideLastFrame)  {
+                    if (handsInsideLastFrame) {
                         if (primed) {
                             onPress();
                         } else {
@@ -115,18 +113,18 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
         function updateText(str: string) {
             clearText();
             setText(str);
-    
+
             function setText(str: string) {
                 textMesh = getCenteredText(str, textProperties);
                 textMesh.position.add(new THREE.Vector3(0, box.max.y, box.min.z));
-        
+
                 const offset = new THREE.Vector3(0, 0, -0.1);
                 textMesh.position.add(offset);
                 textMesh.rotateX(-0.75);
                 scene.add(textMesh);
-            }    
+            }
         }
-    
+
         function clearText() {
             if (textMesh) scene.remove(textMesh);
         }
@@ -143,7 +141,7 @@ function handsInBox(hands: THREE.XRHandSpace[], box: THREE.Box3) {
         const centre = joint.position;
 
         const jointSphere = new THREE.Sphere(centre, radius);
-        const sphereBoundingBox = new THREE.Box3(); 
+        const sphereBoundingBox = new THREE.Box3();
         jointSphere.getBoundingBox(sphereBoundingBox);
 
         return box.containsBox(sphereBoundingBox);
