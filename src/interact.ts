@@ -7,6 +7,7 @@ import { getCenteredText } from "./text_display";
 
 const greenMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00,  opacity:0.4, transparent:true});
 const redMaterial = new THREE.MeshBasicMaterial( {color: 0xff0000,  opacity:0.4, transparent:true});
+const blueMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff,  opacity:0.1, transparent:true});
 
 type interactText = {
     enterText: string,
@@ -30,7 +31,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
     return new Promise(resolve => {
         // Create the cube itself
         const cubeGeom = new THREE.BoxGeometry( 1, 0.4, 1 );
-        const cube = new THREE.Mesh( cubeGeom, greenMaterial );
+        const cube = new THREE.Mesh( cubeGeom, blueMaterial );
     
         // Also add a wireframe to the cube to better see the depth
         const _wireframe = new THREE.EdgesGeometry( cubeGeom ); 
@@ -53,19 +54,49 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
             updateText(text.enterText);
         }
 
-    
+        const frameThreshold = 50;
+        let handsInside = false;
+        let handsInsideLastFrame = false;
+        let framesInside = 0;
+        let primed = false;
+
         frameListeners["button"] = () => {
-            if (handsInBox(hands, box)) {
-                onHandsEnterBox();
-            } else if (wasInBox) {
-                onPress();
+            handsInsideLastFrame = handsInside;
+            handsInside = handsInBox(hands, box);
+
+            if (handsInside) {
+                if (handsInsideLastFrame) {
+                    framesInside++;
+
+                    if (framesInside > frameThreshold) {
+                        primed = true;
+                        onPrime();
+                    } 
+                } else {
+                    onHandsFirstEnter();
+                }
+            } else {
+                if (handsInsideLastFrame)  {
+                    if (primed) {
+                        onPress();
+                    } else {
+                        onCancel();
+                    }
+                }
             }
         };
 
-        function onHandsEnterBox() {
+        function onHandsFirstEnter() {
             cube.material = redMaterial;
-            updateText(text.removeText);
-            wasInBox = true;
+        }
+
+        function onCancel() {
+            cube.material = blueMaterial;
+        }
+
+        function onPrime() {
+            cube.material = greenMaterial;
+            updateText(text.removeText)
         }
 
         function onPress() {
