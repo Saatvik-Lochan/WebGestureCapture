@@ -61,7 +61,7 @@ export class GestureDemonstration {
         Object.values(this.hands).forEach(hand => hand.visible = true);
         frameListeners[this.name] = {
             fcn: () => this.nextFrame(),
-            t: 1
+            t: 1,
         }
     }
 
