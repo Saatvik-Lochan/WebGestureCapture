@@ -129,3 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 src/NewFrontEnd.code-workspace
+
+# tsc output
+lib
+config
+temp

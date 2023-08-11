@@ -1,4 +1,7 @@
 {
+  "name": "web-gesture-capture",
+  "typings": "",
+  "version": "1.0.0",
   "scripts": {
     "build": "vite build src",
     "preview": "vite preview src"
