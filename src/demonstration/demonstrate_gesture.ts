@@ -2,7 +2,6 @@ import { Group, Matrix4, Object3D, XRHandSpace, XRJointSpace } from "three";
 import { frameListeners, scene } from "../init";
 import { handSequence, indexToJointName } from "../hand_capture";
 import { XRHandMeshModel } from "three/examples/jsm/webxr/XRHandMeshModel";
-import { XRHandPrimitiveModel } from "three/examples/jsm/webxr/XRHandPrimitiveModel";
 
 /**
  * Supposed to mimic {@link XRHandModel}, while relaxing the constraints 
