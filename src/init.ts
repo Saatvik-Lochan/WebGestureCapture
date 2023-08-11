@@ -5,15 +5,96 @@ import { getNextTrial } from "./http_handler";
 import { performTrial } from "./trial_manager";
 
 // main resources
+/**
+ * The main renderer for the scene
+ */
 let renderer: THREE.WebGLRenderer;
-let camera: THREE.PerspectiveCamera;
-let scene: THREE.Scene;
-let audio: THREE.Audio;
-let hands: THREE.XRHandSpace[]; // hands for handmodels only
 
-export type frameListener = { fcn: () => any, t: number, offset?: number };
+/**
+ * The main camera for the scene
+ */
+let camera: THREE.PerspectiveCamera;
+
+/**
+ * The main scene
+ */
+let scene: THREE.Scene;
+
+/**
+ * The audio source for the scene
+ */
+let audio: THREE.Audio;
+
+/**
+ * A list of hands for the display of the hand models
+ * 
+ * @remarks This does not include the demonstration ghost hands
+ * @remarks This is not used in the capture of hand data
+ */
+let hands: THREE.XRHandSpace[]; 
+
+/**
+ * An object used to record information on functions to be run regularly in 
+ * a loop.
+ */
+export type frameListener = { 
+    /**
+     * The function to be called in the loop
+     * @returns The return of this function is discarded when called in the loop
+     */
+    fcn: () => any, 
+
+    /**
+     * The time period between each call of `fcn`
+     * 
+     * @example
+     * A `t` of 1 would run every cycle of the loop (i.e. every frame)
+     * A `t` of 2 would run every alternate frame, etc.
+     */
+    t: number, 
+
+    /**
+     * The offset of when this function is called. This must be less than
+     * `t`. 
+     * 
+     * @remarks If left unassigned, defaults to `0`
+     * @remarks Use this so that two `frameListener`s can be interleaved.
+     * i.e. if they both run on alternate frames, you can use `offset` so that
+     * one runs on every odd frame, while the other runs on every even frame. 
+     */
+    offset?: number 
+};
+
+/**
+ * A record of {@link frameListener} which need to be run regularly in the 
+ * animation loop. This is the recommended way to do so, without changing 
+ * the animation loop itself.
+ * 
+ * @remarks frameListener's must be deleted when they are no longer in use
+ * @example
+ * ```ts
+ *  frameListeners["Hello World"] = {
+ *      fcn: () => console.log("Hello World"),
+ *      t: 2,
+ *      offset: 1          
+ *  }
+ * 
+ *  setTimeout(() => delete frameListeners["Hello World"], 5000)
+ * // Expected result is for the console to log "Hello World" every alternate
+ * // frame, starting at the second frame (see offset), for 5 seconds
+ * ```
+ */
 let frameListeners: Record<string, frameListener> = {};
+
+/**
+ * The name of the project which contains the {@link participant} whose
+ * trial must be displayed 
+ */
 let project: string;
+
+/**
+ * The id of the participant whose trial must be displayed
+ */
 let participant: string;
 
 async function test() {
@@ -44,6 +125,26 @@ async function test() {
     });
 }
 
+/**
+ * Instantiates the scene. This must be run to use {@link scene}, {@link renderer},
+ * {@link camera}, {@link audio}, {@link hands}.
+ * 
+ * @remarks This does not set up the VR Button, or bind to 
+ * the vr `startsession`. However, it does enable vr.
+ * 
+ * @example
+ * ```ts
+ *  async function main() {
+ *      await initScene();
+ *      await initOwn();
+ *      animate();
+ *  }
+ * 
+ * async function initOwn() {
+ *      // do route specific init here
+ * }
+ * ```
+ */
 async function initScene() {
     initRenderer();
     initCameraAndScene();
@@ -87,6 +188,12 @@ async function initScene() {
     }
 }
 
+/**
+ * Used to set up the main route. Where participants perform a trial.
+ * Must be run with {@link initScene} and {@link animate}. 
+ * 
+ * @see {@link initScene} for usage example
+ */
 async function initProject() {
     const urlParams = new URLSearchParams(window.location.search);
     project = urlParams.get('project');
@@ -131,6 +238,10 @@ async function initProject() {
 
 }
 
+/**
+ * Sets up the main animate loop. Add functions to the loop with the use of 
+ * {@link frameListeners}.
+ */
 function animate() {
 
     let frameNumber = 0;

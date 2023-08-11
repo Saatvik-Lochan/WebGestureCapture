@@ -1,15 +1,35 @@
+/**
+ * The url of to the backend {@link https://github.com/Saatvik-Lochan/WebGestureCaptureBackend | server}
+ */
 export const backend_url = "https://gesturelogger.com:8000";
 
+/**
+ * Used to uniquely identify a gesture class
+ * 
+ * @remarks does not identify a gesture instance
+ */
 export interface GestureClassLocator {
     project_name: string;
     gesture_id: string;
 }
 
+/**
+ * Returns a {@link FormData} object with a buffer as a field
+ * @param buffer The {@link ArrayBuffer} to add to `formData`
+ * @param formData The {@link FormData} on which to add the data
+ * @returns A {@link FormData} object which includes the buffer under the field
+ * `'data'`, as a {@link Blob}
+ */
 function addBufferToFormData(buffer: ArrayBuffer, formData: FormData) {
     formData.append('data', new Blob([buffer]));
     return formData
 }
 
+/**
+ * Gets the {@link FormData} which descibes a {@link GestureLocator}
+ * @param gestureLocator The {@link GestureLocator} to turn into a {@link FormData}
+ * @returns A {@link FormData} with fields for each of the fields in the `gestureLocator`
+ */
 function getFormDataFrom(gestureLocator: GestureLocator) {
     const formData = new FormData();
     formData.append('project_name', gestureLocator.project_name);
@@ -19,6 +39,15 @@ function getFormDataFrom(gestureLocator: GestureLocator) {
     return formData
 }
 
+/**
+ * Tells the server specified in {@link backend_url} that it will soon start
+ * the transfer of data.
+ * 
+ * @remarks Normally followed up by {@link sendHandGestureBatch}
+ * @param gestureLocator A {@link GestureLocator} which points to the gesture
+ * to start the transfer for
+ * @returns A `Promise<Response>` with the result of the transfer
+ */
 export async function startHandGestureTransfer(gestureLocator: GestureLocator) {
     const formData = getFormDataFrom(gestureLocator);
 
