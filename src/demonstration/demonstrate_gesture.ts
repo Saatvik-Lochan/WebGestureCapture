@@ -1,13 +1,25 @@
 import { Group, Matrix4, Object3D, XRHandSpace, XRJointSpace } from "three";
 import { frameListeners, scene } from "../init";
-import { indexToJointName } from "../hand_capture";
+import { handSequence, indexToJointName } from "../hand_capture";
 import { XRHandMeshModel } from "three/examples/jsm/webxr/XRHandMeshModel";
 import { XRHandPrimitiveModel } from "three/examples/jsm/webxr/XRHandPrimitiveModel";
 
+/**
+ * Supposed to mimic {@link XRHandModel}, while relaxing the constraints 
+ * imposed by {@link XRHandModelFactory}.
+ */
 class GhostHandModel extends Object3D {
 
-    controller: XRHandSpace;
-    motionController: XRHandMeshModel | XRHandPrimitiveModel;
+    /**
+     * The {@link GhostHandSpace} whose {@link XRJointSpace | joint} positions
+     * dictate the positions taken by the mesh in {@link motionController}
+     */
+    controller: GhostHandSpace;
+
+    /**
+     * The mesh of the hand that is visible on screen
+     */
+    motionController: XRHandMeshModel;
 
     constructor(controller) {
 
@@ -32,59 +44,120 @@ class GhostHandModel extends Object3D {
 
 }
 
+/**
+ * An {@link XRHandSpace} which is not connected to the users input controller,
+ * i.e. it does not automatically follow the users hands
+ */
+type GhostHandSpace = XRHandSpace;
+
+/**
+ * Represents a space in which you can load {@link handSequence} data to 
+ * display hand demonstrations
+ */
 export class GestureDemonstration {
 
-    name: string
-    data: number[]
-    frames: number
-    currentFrame: number
-    translation = new Matrix4().makeTranslation(0, 0, -1);
-    hands: { leftHand: XRHandSpace, rightHand: XRHandSpace };
+    /**
+     * The name of the {@link GestureDemonstration}. Is used to attach to
+     * {@link frameListeners}, so should be unique amongst objects.
+     */
+    #name: string
+
+    /**
+     * The data to be displayed.
+     */
+    #data: handSequence
+
+    /**
+     * The number of frames detected in the input data
+     */
+    #frames: number
+
+    /**
+     * The current frame the playback is displaying
+     */
+    #currentFrame: number
+
+    /**
+     * A translation applied to the demonstration to place them in the world
+     */
+    #translation = new Matrix4().makeTranslation(0, 0, -1);
+
+    /**
+     * The hands displaying the demonstration
+     */
+    #hands: { leftHand: GhostHandSpace, rightHand: GhostHandSpace };
 
     constructor(name: string) {
-        this.name = name;
-        this.hands = addBothGhostHands();
-        Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
+        this.#name = name;
+        this.#hands = addBothGhostHands();
+        Object.values(this.#hands).forEach(hand => hand.applyMatrix4(this.#translation));
     }
 
-    load(data: number[]) {
+    /**
+     * This will load a {@link handSequence} into the {@link GestureDemonstration}
+     * and replace any previously loaded sequence. 
+     * 
+     * @param data A {@link handSequence} of data to display
+     * @remarks This will stop playback when called
+     */
+    load(data: handSequence) {
         this.stopPlayback();
 
-        console.log('%cdemonstrate_gesture.ts line:53 data', 'color: #007acc;', data);
-
-        this.data = data;
-        this.frames = getFrames(data);
-        this.currentFrame = 0;
+        this.#data = data;
+        this.#frames = getFrames(data);
+        this.#currentFrame = 0;
     }
 
+    /**
+     * Start the playback of the demonstration
+     */
     startPlaybackLoop() {
-        Object.values(this.hands).forEach(hand => hand.visible = true);
-        frameListeners[this.name] = {
-            fcn: () => this.nextFrame(),
+        Object.values(this.#hands).forEach(hand => hand.visible = true);
+        frameListeners[this.#name] = {
+            fcn: () => this._nextFrame(),
             t: 1,
         }
     }
 
+    /**
+     * Stop the playback of the demonstration
+     */
     stopPlayback() {
-        Object.values(this.hands).forEach(hand => hand.visible = false);
-        delete frameListeners[this.name];
+        Object.values(this.#hands).forEach(hand => hand.visible = false);
+        delete frameListeners[this.#name];
     }
 
-    nextFrame() {
-        const nextFrame = (this.currentFrame + 1) % this.frames;
-        this.updateToFrame(nextFrame);
+    /**
+     * Find the next frame and update to it.
+     * 
+     * @remarks Will loop back to the start if on the last frame
+     */
+    _nextFrame() {
+        const nextFrame = (this.#currentFrame + 1) % this.#frames;
+        this._updateToFrame(nextFrame);
     }
 
-    updateToFrame(frame: number) {
-        if (frame < 0 || this.frames <= frame) return;
+    /**
+     * Updates the demonstration to the specified frame
+     * @param frame The index of the frame to go to. If the frame is outside 
+     * the range of the data, it will do nothing
+     */
+    _updateToFrame(frame: number) {
+        if (frame < 0 || this.#frames <= frame) return;
 
-        this.currentFrame = frame;
-        setHandsToFrame(this.currentFrame, this.data, this.hands.leftHand, this.hands.rightHand);
+        this.#currentFrame = frame;
+        setHandsToFrame(this.#currentFrame, this.#data, this.#hands.leftHand, this.#hands.rightHand);
     }
 }
 
-function getNewHand() {
-    const hand = new Group() as XRHandSpace;
+/**
+ * Create a new {@link GhostHandSpace} 
+ * 
+ * @remarks the handedness is ambiguous at this stage and not relevant
+ * @returns A {@link GhostHandSpace} with all joint positions unassigned
+ */
+function getNewHand(): GhostHandSpace {
+    const hand = new Group() as GhostHandSpace;
     hand.visible = true;
     hand.matrixAutoUpdate = false;
 
@@ -113,26 +186,47 @@ function getNewHand() {
     }
 }
 
-function setHandsToFrame(frame: number, data: number[], leftHand: XRHandSpace, rightHand: XRHandSpace) {
+/**
+ * Sets the positions of the {@link GhostHandSpace | hands} to that described by a {@link handSequence}
+ * @param frame The index of the where the `handFrame` starts in the {@link handSequence}
+ * @param data A {@link handSequence} describing a gesture
+ * @param leftHand A {@link GhostHandSpace} for the left hand
+ * @param rightHand A {@link GhostHandSpace} for the right hand
+ */
+function setHandsToFrame(frame: number, data: handSequence, leftHand: GhostHandSpace, rightHand: GhostHandSpace) {
     populateHandFromIndex(leftHand, data, frame * 352);
     populateHandFromIndex(rightHand, data, frame * 352 + 175);
 }
 
-function getFrames(data: number[]) {
+/**
+ * Get the number of frames in a {@link handSequence}
+ * @param data A {@link handSequence}
+ * @returns A number which describes the number of frames in the specified {@link handSequence}
+ */
+function getFrames(data: handSequence) {
     return Math.floor(data.length / 352);
 }
 
+/**
+ * Adds two ghost hands (hands not connected to the users input controllers) to the {@link scene}
+ * @returns An object with 
+ *      - leftHand: A {@link GhostHandSpace} representing the left hand
+ *      - rightHand: A {@link GhostHandSpace} representing the right hand
+ */
 export function addBothGhostHands() {
     return { leftHand: addGhostHand("left"), rightHand: addGhostHand("right") }
 }
 
+/**
+ * Adds a ghost hand to the {@link scene}
+ * @param handedness Whether the created hand should be left or right handed
+ * @returns A {@link GhostHandSpace} representing a hand
+ */
 function addGhostHand(handedness: "left" | "right") {
     const hand = getNewHand();
     const handModel = new GhostHandModel(hand);
     const primitiveModel = new XRHandMeshModel(handModel, hand, null, handedness);
     handModel.motionController = primitiveModel;
-
-    // hand.visible = false;
 
     hand.add(handModel);
     scene.add(hand);
@@ -140,7 +234,13 @@ function addGhostHand(handedness: "left" | "right") {
     return hand
 }
 
-function populateHandFromIndex(hand: XRHandSpace, data: number[], handStartIndex: number) {
+/**
+ * Sets the positions of the joints of a {@link GhostHandSpace | hand} from a {@link handSequence}
+ * @param hand A {@link GhostHandSpace} whose position must be updated
+ * @param data A {@link handSequence} in which to find the required position data
+ * @param handStartIndex The first index of the `175` long stretch required to populate the hand
+ */
+function populateHandFromIndex(hand: GhostHandSpace, data: handSequence, handStartIndex: number) {
     const joints = Object.values(hand.joints);
 
     for (let jointIndex = 0; jointIndex <= 24; jointIndex++) {

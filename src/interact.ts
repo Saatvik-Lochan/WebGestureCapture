@@ -8,13 +8,37 @@ const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.
 const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
 
+/**
+ * An object which describes the text displayed above an interactBox 
+ */
 type interactText = {
+    /**
+     * The initial text displayed by the box
+     */
     enterText: string,
+
+    /**
+     * The text that appears once the box first turns green
+     * after the hands have been inside the box for a certain amount of time
+     */
     removeText: string,
+
+    /**
+     * The {@link Font} used by the text
+     */
     font: Font
 }
 
-function createInteractBox(scene: THREE.Scene, text: interactText = null) {
+/**
+ * Places a box inside the scene for the user to interact with. The function
+ * returns a promise that resolves once the box has been activated
+ * @param scene The scene in which to place the interactBox
+ * @param text The {@link interactText} which describes the text on this box 
+ * @returns A {@link Promise} that resolves in `undefined` once the box has 
+ * been actived, i.e. once the user has placed their hands inside the box, 
+ * waited for it to turn green, then removed their hands.
+ */
+function createInteractBox(scene: THREE.Scene, text: interactText = null): Promise<undefined> {
     const textProperties: TextGeometryParameters = {
         font: text.font,
         size: 0.05,
@@ -131,7 +155,16 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null) {
     })
 }
 
-function handsInBox(hands: THREE.XRHandSpace[], box: THREE.Box3) {
+/**
+ * Checks if the users hands are completely inside a box
+ * @param hands An array of {@link THREE.XRHandSpace |XRHandSpace}s 
+ * @param box A {@link THREE.Box3 | Box3} in which to check if the hands are
+ * @returns A `boolean`, which is `true` if and only if every joint is 
+ * inside the {@link box}. A joint is considered inside if a sphere with centre
+ * at that joint's position and with the same radius as that joint is 
+ * completely within the {@link box}
+ */
+function handsInBox(hands: THREE.XRHandSpace[], box: THREE.Box3): boolean {
     const jointSpaces = hands.flatMap((hand) => (Object.values(hand.joints)));
     return jointSpaces.every((jointSpace) => jointInBox(jointSpace));
 

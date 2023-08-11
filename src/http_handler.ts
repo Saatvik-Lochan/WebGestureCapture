@@ -1,4 +1,4 @@
-import { handArrayBuffer } from "./hand_capture";
+import { handArrayBuffer, handSequence } from "./hand_capture";
 
 /**
  * The url of to the backend {@link https://github.com/Saatvik-Lochan/WebGestureCaptureBackend | server}
@@ -207,9 +207,10 @@ export async function shortCodeExists(shortCode: string): Promise<{status: boole
  * Gets a demonstration from the server and formats it as a data array
  * @param project_name The name of the project
  * @param gesture_id The id of the gesture class to get the demonstration for
- * @returns 
+ * @returns A {@link Promise} with a {@link handSequence} describing the 
+ * demonstration
  */
-export async function getDemonstration(project_name: string, gesture_id: string) {
+export async function getDemonstration(project_name: string, gesture_id: string): Promise<handSequence> {
     const response = await fetch(
         `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_id}`, {
         method: 'GET',
