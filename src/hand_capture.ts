@@ -3,6 +3,38 @@ import { frameListener, frameListeners } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 /**
+ * An array of handData of length `352`. It is composed of `2` hands each of length 
+ * `175` - left hand first. Along with `2` values for the `startTime` and the `endTime`. 
+ * 
+ * Each hand is composed of `25` joints in the order 
+ * of {@link indexToJointName}. Each joint is composed of `7` data values. 
+ * The first `3` describe the `[x, y, z]` position, the last `4` describe
+ * the `[x, y, z, w]` quaternion.
+ */
+export type handFrame = number[];
+
+/**
+ * An array which consists of multiple {@link handFrame | handFrame}s 
+ * concatenated end on end.
+ */
+export type handSequence = number[];
+
+/**
+ * An {@link ArrayBuffer} which is a transformed {@link handSequence}.
+ * 
+ * @example
+ * Creation
+ * ```ts
+ * 	// handSeq is a handSequence
+ * const floatArray = Float32Array(handSeq)
+ * const handBuffer: handArrayBuffer = floatArray.buffer;
+ * ```
+ * @remarks It is used to send compact a {@link handSequence} to send over http
+ * @see {@link capturedToBuffer} for creation in code
+ */
+export type handArrayBuffer = ArrayBuffer;
+
+/**
  * A list of joint names, which are laid out in the
  * {@link https://www.w3.org/TR/webxr-hand-input-1/#skeleton-joints-section | WebXR standard}.
  * 
@@ -56,16 +88,9 @@ function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
  * @param renderer The xr-enabled {@link WebGLRenderer} for the scene. Used
  * to grab the {@link XRHandSpace | hand spaces} of the current user
  * @param clock A {@link Clock} used to record `startTime` and the `endTime`
- * @returns 
- * An array of handData of length `352`. It is composed of `2` hands each of length 
- * `175` - left hand first. Along with `2` values for the `startTime` and the `endTime`. 
- * 
- * Each hand is composed of `25` joints in the order 
- * of {@link indexToJointName}. Each joint is composed of `7` data values. 
- * The first `3` describe the `[x, y, z]` position, the last `4` describe
- * the `[x, y, z, w]` quaternion.
+ * @returns a {@link handFrame | frame} of hand gesture data
  */
-function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
+function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): handFrame {
 	const hand0 = renderer.xr.getHand(0);
 	const hand1 = renderer.xr.getHand(1);
 
@@ -107,10 +132,10 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): number[] {
  * @returns An array of arrays. Each sub-array contains a single frame of data as captured
  * by {@link getHandDataAsArray}.
  */
-export async function captureHandSequence(durationMs: number, renderer: WebGLRenderer): Promise<number[][]> {
+export async function captureHandSequence(durationMs: number, renderer: WebGLRenderer): Promise<handFrame[]> {
 	// setting as 0 for now
 	const clock = new Clock(true);
-	const capturedData: number[][] = [];
+	const capturedData: handFrame[] = [];
 
 	frameListeners[0] = {
 		fcn: () => capturedData.push(getHandDataAsArray(renderer, clock)),
@@ -134,7 +159,7 @@ export async function captureHandSequence(durationMs: number, renderer: WebGLRen
  * which project to register the demonstration data with.
  */
 export async function streamHandDataDemonstration(durationMs: number, renderer: WebGLRenderer, shortCode: string) {
-	const sendFcn = (captured: number[][]) => sendDemonstrationBatch(capturedToBuffer(captured), shortCode);
+	const sendFcn = (captured: handFrame[]) => sendDemonstrationBatch(capturedToBuffer(captured), shortCode);
 	await streamHandData(durationMs, renderer, sendFcn);
 }
 
@@ -149,24 +174,23 @@ export async function streamHandDataDemonstration(durationMs: number, renderer: 
  * to send the data for this gesture instance.
  */
 export async function startAndStreamHandDataToMain(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator) {
-	const sendFcn = (captured: number[][]) => sendHandGestureBatch(capturedToBuffer(captured), gestureLocator);
+	const sendFcn = (captured: handFrame[]) => sendHandGestureBatch(capturedToBuffer(captured), gestureLocator);
 
 	await startHandGestureTransfer(gestureLocator);
 	await streamHandData(durationMs, renderer, sendFcn);
 }
 
 /**
- * Used to compact a 2D array to a more data efficient form, to send 
- * over https. It flattens the input array before converting it to a 
+ * Used to compact an array of {@link handFrame} 
+ * to send over https. It flattens the input array before converting it to a 
  * {@link Float32Array}, and grabs the {@link ArrayBuffer} from that.
  * 
- * @remarks initially designed to use with {@link streamHandData}
- * 
- * @param captureData A `number[][]` of data
+ * @param captureData An array of {@link handFrame}s
  * @returns A compact form of the data as an {@link ArrayBuffer}
+ * @remarks initially intended for use with {@link streamHandData}
  */
-export function capturedToBuffer(captureData: number[][]): ArrayBuffer {
-	const dataAsFloatArr = new Float32Array(captureData.flat());
+export function capturedToBuffer(captureData: handFrame[]): handArrayBuffer {
+	const dataAsFloatArr = new Float32Array(captureData.flat() as handSequence);
 	return dataAsFloatArr.buffer;
 }
 
@@ -184,9 +208,8 @@ export function capturedToBuffer(captureData: number[][]): ArrayBuffer {
  * @param renderer The xr-enabled {@link WebGLRenderer} for the scene. Used
  * to grab the {@link XRHandSpace | hand spaces} of the current user
  * @param sendFcn The function which is used to consume the data. The input
- * for this function will be a `number[][]` which consists of 
- * {@link blockSize} number of `number[]`, each array is a captured frame as described 
- * in {@link getHandDataAsArray}.
+ * for this function will be a `handFrame[]` which consists of 
+ * {@link blockSize} number of {@link handFrame}.
  * @param blockSize The number of frames captured before `sendFcn` consumes them.
  * @param name The name of the frame listener to attach this function to. 
  * Ensure it is unique.
@@ -197,7 +220,7 @@ export function capturedToBuffer(captureData: number[][]): ArrayBuffer {
  * less than `timePeriod`. See {@link frameListener}.
  */
 async function streamHandData(durationMs: number, renderer: WebGLRenderer,
-	sendFcn: (data: number[][]) => any, blockSize: number = 1000, 
+	sendFcn: (data: handFrame[]) => any, blockSize: number = 1000, 
 	name: string = "captureHands",
 	timePeriod: number = 1,
 	offset: number = 0) {

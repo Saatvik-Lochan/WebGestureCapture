@@ -1,3 +1,5 @@
+import { handArrayBuffer } from "./hand_capture";
+
 /**
  * The url of to the backend {@link https://github.com/Saatvik-Lochan/WebGestureCaptureBackend | server}
  */
@@ -59,7 +61,19 @@ export async function startHandGestureTransfer(gestureLocator: GestureLocator) {
     );
 }
 
-export async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: GestureLocator) {
+/**
+ * Sends hand gesture data to the server specified by {@link backend_url}
+ * 
+ * @remarks {@link startHandGestureTransfer} must be called before this can be called
+ * @remarks This function can be called multiple times to append more data
+ * @param data An {@link handArrayBuffer} of data to send
+ * @param gestureLocator A {@link GestureClassLocator | locator} which uniquely
+ * identifies a gesture instance on the server
+ * @returns A `Promise<Response>` with the return value
+ * 
+ * @remarks route: /gesture-data/append-data
+ */
+export async function sendHandGestureBatch(data: handArrayBuffer, gestureLocator: GestureLocator) {
     const formData = addBufferToFormData(data, getFormDataFrom(gestureLocator));
 
     const response = await fetch(
@@ -75,8 +89,14 @@ export async function sendHandGestureBatch(data: ArrayBuffer, gestureLocator: Ge
     return response;
 }
 
-// handles sending the data with a POST request
-export async function sendData(data: object, route = "", method = "POST") {
+/**
+ * Sends arbitraty data to a route on {@link backend_url}
+ * @param data An arbitrary object to send.
+ * @param route The route to send the data on {@link backend_url}. Defaults to `POST`
+ * @param method The HTTP method to use
+ * @returns A `Promise<Response>` returned by the {@link backend_url | server}
+ */
+export async function sendData(data: object, route = "", method: "POST" | "GET" | "PUT" = "POST") {
     return await fetch(`${backend_url}/${route}`, {
         method,
         body: JSON.stringify(data),
@@ -87,6 +107,14 @@ export async function sendData(data: object, route = "", method = "POST") {
     })
 }
 
+/**
+ * Fetches the a response with the next trial for a specified participant.
+ * 
+ * @remarks route: /trial/next-trial/{project_name}/{participant_id}
+ * @param project_name The name of the project
+ * @param participant_id The id of the participant whose trial is needed
+ * @returns A `Promise<Response>` with the trial data if successful
+ */
 export async function getNextTrial(project_name: string, participant_id: string) {
     const response = await fetch(
         `${backend_url}/trial/next-trial/${project_name}/${participant_id}`, {
@@ -97,16 +125,34 @@ export async function getNextTrial(project_name: string, participant_id: string)
     return response
 }
 
+/**
+ * Marks a trial as complete on the {@link backend_url | server}
+ * @param trial_id The id of the trial to mark complete
+ * @param project_name The name of the project
+ * @param participant_id The id of the participant
+ * @returns A `Promise<Response>` from the {@link backend_url | server}
+ * 
+ * @remarks route: /trial/complete-trial/{project_name}/{participant_id}/{trial_id}
+ */
 export async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
         method: 'POST',
-    }
-    );
+    });
 }
 
 // http requests for demonstration
-export async function startDemonstrationTransfer(shortCode: string) {
+/**
+ * Starts a demonstration. This must be called before {@link sendDemonstrationBatch}.
+ * @param shortCode A code which identifies a gesture class on the {@link backend_url | server}
+ * @returns An object with two fields: 
+ *      - status: a {@link boolean} which indicates the success of the request
+ *      - locator: a {@link GestureClassLocator} which points to the gesture of the demonstration that has been started
+ * 
+ * @remarks route: /demonstration/start-transfer/{shortCode}
+ * @see {@link startHandGestureTransfer}
+ */
+export async function startDemonstrationTransfer(shortCode: string): Promise<{status: boolean, locator: GestureClassLocator}> {
     const result = await fetch(`${backend_url}/demonstration/start-transfer/${shortCode}`, {
         method: "POST",
     })
@@ -114,7 +160,16 @@ export async function startDemonstrationTransfer(shortCode: string) {
     return { status: result.status == 201, locator: await result.json() };
 }
 
-export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: string) {
+/**
+ * Sends gesture demonstration data to the server specified by {@link backend_url}.
+ * 
+ * @remarks {@link startDemonstrationTransfer} must be called before this can be called
+ * @remarks This function can be called multiple times to append more data
+ * @param data An {@link handArrayBuffer} of data to send
+ * @param shortcode A code which identifies a gesture class on the {@link backend_url | server}
+ * @returns A `Promise<Response>` with the response from the server
+ */
+export async function sendDemonstrationBatch(data: handArrayBuffer, shortcode: string) {
     const formData = addBufferToFormData(data, new FormData());
 
     const response = await fetch(
@@ -130,16 +185,30 @@ export async function sendDemonstrationBatch(data: ArrayBuffer, shortcode: strin
     return response;
 }
 
-export async function shortCodeExists(shortCode: string) {
+/**
+ * Checks if a shortCode exists. Also returns a {@link GestureClassLocator} for the that {@link shortCode}
+ * @param shortCode A code which identifies a gesture class on the {@link backend_url | server}
+ * @returns An object with two fields: 
+ *      - status: a {@link boolean} which indicates the success of the request
+ *      - locator: a {@link GestureClassLocator} which points to the gesture of the demonstration that has been started
+ * 
+ * @remarks route: /demonstration/shortcode-exists/{shortCode}
+ */
+export async function shortCodeExists(shortCode: string): Promise<{status: boolean, locator: GestureClassLocator}> {
     const result = await fetch(
         `${backend_url}/demonstration/shortcode-exists/${shortCode}`, {
         method: 'GET',
-    }
-    );
+    });
 
     return { status: result.status == 200, locator: await result.json() };
 }
 
+/**
+ * Gets a demonstration from the server and formats it as a data array
+ * @param project_name The name of the project
+ * @param gesture_id The id of the gesture class to get the demonstration for
+ * @returns 
+ */
 export async function getDemonstration(project_name: string, gesture_id: string) {
     const response = await fetch(
         `${backend_url}/demonstration/get-demonstration/${project_name}/${gesture_id}`, {
