@@ -15,5 +15,6 @@ export default defineConfig ({
         demonstration: resolve(__dirname, 'src/demonstration/index.html'),
       },
     },
+    outDir: resolve(__dirname, 'dist')
   },
 })
