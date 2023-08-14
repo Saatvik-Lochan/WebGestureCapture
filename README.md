@@ -19,11 +19,11 @@ https://vitejs.dev/guide/build.html for building and deployment options.
 
 For most it will be enough to run
 
-`npm install`
+```npm install```
 
 and then build the project with 
 
-`npx vite build`
+```npx vite build```
 
 ### Hosting
 
