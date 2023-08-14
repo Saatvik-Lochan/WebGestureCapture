@@ -87,45 +87,6 @@ export type frameListener = {
 let frameListeners: Record<string, frameListener> = {};
 
 /**
- * The name of the project which contains the {@link participant} whose
- * trial must be displayed 
- */
-let project: string;
-
-/**
- * The id of the participant whose trial must be displayed
- */
-let participant: string;
-
-async function test() {
-    await initScene();
-    animate();
-    renderer.xr.addEventListener('sessionstart', async () => {
-        const trial: Trial = {
-            "trial_id": "1",
-            "trial_name": "test",
-            "instructions": "Place your hands in the box then remove\nthem to go to the next instruction",
-            "gestures": [
-                {
-                    "gesture_id": "1",
-                    "gesture_name": "Clap",
-                    "duration": 2,
-                    "instruction": "Clap your hands",
-                },
-                {
-                    "gesture_id": "1",
-                    "gesture_name": "Thumbs up",
-                    "duration": 2,
-                    "instruction": "Do a thumbs up with both hands",
-                }
-            ]
-        }
-        console.log("trial performance started");
-        await performTrial(trial, scene, renderer, project, participant);
-    });
-}
-
-/**
  * Instantiates the scene. This must be run to use {@link scene}, {@link renderer},
  * {@link camera}, {@link audio}, {@link hands}.
  * 
@@ -196,8 +157,8 @@ async function initScene() {
  */
 async function initProject() {
     const urlParams = new URLSearchParams(window.location.search);
-    project = urlParams.get('project');
-    participant = urlParams.get('participant');
+    const project = urlParams.get('project');
+    const participant = urlParams.get('participant');
 
     let message = "Unknown error";
 
@@ -254,5 +215,5 @@ function animate() {
     });
 }
 
-export { frameListeners, project, participant, audio, hands };
+export { frameListeners, audio, hands };
 export { initScene, initProject, animate, renderer, scene };
