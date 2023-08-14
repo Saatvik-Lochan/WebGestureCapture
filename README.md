@@ -55,3 +55,6 @@ content. You can easily get your own certificate with [LetsEncrypt](https://lets
 You're encouraged to fork this project to add features relevant to your 
 project. The project has [JSDoc](https://jsdoc.app/) annotations that your
 IDE should detect for ease of development.
+
+Take a look at `/src/main.ts` and `/src/demonstration/main.ts` for a
+basic template on how to use the other VR functionality the project provides.
