@@ -149,55 +149,6 @@ async function initScene() {
     }
 }
 
-/**
- * Used to set up the main route. Where participants perform a trial.
- * Must be run with {@link initScene} and {@link animate}. 
- * 
- * @see {@link initScene} for usage example
- */
-async function initProject() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const project = urlParams.get('project');
-    const participant = urlParams.get('participant');
-
-    let message = "Unknown error";
-
-    try {
-        if (project && participant) {
-            const response = await getNextTrial(project, participant);
-
-            switch (response.status) {
-                case 200:
-                    document.body.appendChild(VRButton.createButton(renderer));
-                    const trial = await response.json();
-                    message = "You have pending trials. Click 'Enter VR' to start"
-
-                    renderer.xr.addEventListener('sessionstart', () => {
-                        performTrial(trial, scene, renderer, project, participant)
-                    });
-                    renderer.xr.addEventListener('sessionend', () => {
-                        location.reload();
-                    });
-
-                    break;
-                default:
-                    message = await response.text();
-            }
-        } else {
-            message = "Project and participant are not set"
-        }
-    } catch (err) {
-        console.log(err);
-        message = "Issue connecting to server, try again later"
-    } finally {
-        setText(message);
-    }
-
-    function setText(message: string) {
-        document.getElementById("instruction-text").innerText = message;
-    }
-
-}
 
 /**
  * Sets up the main animate loop. Add functions to the loop with the use of 
@@ -216,4 +167,5 @@ function animate() {
 }
 
 export { frameListeners, audio, hands };
-export { initScene, initProject, animate, renderer, scene };
+export { initScene } 
+export { animate, renderer, scene };
