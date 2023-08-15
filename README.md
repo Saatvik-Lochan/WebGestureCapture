@@ -17,16 +17,22 @@ this and the backend yourself for any more serious project.
 This frontend uses [vite](https://vitejs.dev/) as a build tool. See
 https://vitejs.dev/guide/build.html for building and deployment options.
 
+First you must clone the repository
+```console
+$ git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
+```
+
+
 For most it will be enough to run
 
-```
-npm install
+```console
+$ npm install
 ```
 
 and then build the project with 
 
-```
-npx vite build
+```console
+$ npx vite build
 ```
 
 ### Hosting
@@ -64,3 +70,8 @@ IDE should detect for ease of development.
 
 Take a look at [`main.ts`](/src/main.ts) and [`demonstration/main.ts`](/src/demonstration/main.ts) for a
 basic template on how to use the other VR functionality the project provides.
+
+Take a look at [this](https://developer.oculus.com/documentation/web/browser-remote-debugging/) 
+for information on debugging browser based VR content. 
+
+This project uses [ThreeJS](https://threejs.org/) and [typescript](https://www.typescriptlang.org/).  
