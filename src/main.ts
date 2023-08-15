@@ -62,5 +62,4 @@ async function initProject() {
     function setText(message: string) {
         document.getElementById("instruction-text").innerText = message;
     }
-
 }
