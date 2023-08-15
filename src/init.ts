@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.js";
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { getNextTrial } from "./http_handler";
-import { performTrial } from "./trial_manager";
+import { backend_url, setBackendUrl } from "./http_handler";
 
 // main resources
 /**
@@ -149,6 +147,20 @@ async function initScene() {
     }
 }
 
+/**
+ * Checks if there is a URL query param of `url`. If there is,
+ * communicates with the server specified by decoding the value of the 
+ * query param.
+ */
+export function updateBackendUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedUrl = urlParams.get('url');
+
+    if (encodedUrl) {
+        const url = decodeURIComponent(encodedUrl);
+        setBackendUrl(url);
+    }
+}
 
 /**
  * Sets up the main animate loop. Add functions to the loop with the use of 

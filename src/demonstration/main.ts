@@ -1,21 +1,15 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { GestureClassLocator, getDemonstration, shortCodeExists, startDemonstrationTransfer } from "../http_handler";
-import { initScene, animate, renderer, scene } from "../init";
+import { initScene, animate, renderer, scene, updateBackendUrl } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
 import { displayString, displayStringIndefinitely, loadFont } from "../text_display";
 import { GestureDemonstration } from "./demonstrate_gesture";
 
 main();
-// test();
-
-async function test() {
-    await initScene();
-
-    animate();
-}
 
 async function main() {
+    updateBackendUrl();
     await initScene();
     await initDemonstration();
     animate();
