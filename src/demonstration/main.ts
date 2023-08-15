@@ -19,13 +19,6 @@ function setMainText(text: string) {
     document.getElementById("instruction-text").innerText = text;
 }
 
-async function testInit(data) {
-    setMainText("Press 'Enter VR' to start");
-    document.body.appendChild(VRButton.createButton(renderer));
-    renderer.xr.addEventListener('sessionstart', async () => { });
-    renderer.xr.addEventListener('sessionend', () => location.reload());
-}
-
 async function initDemonstration(): Promise<any> {
     const urlParams = new URLSearchParams(window.location.search);
     const shortCode = urlParams.get('code');
