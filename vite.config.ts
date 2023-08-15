@@ -9,6 +9,7 @@ export default defineConfig ({
     basicSsl()
   ],
   build: {
+    target: 'esnext',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/index.html'),
@@ -16,6 +17,7 @@ export default defineConfig ({
       },
     },
     outDir: resolve(__dirname, 'dist'),
-    emptyOutDir: true
+    emptyOutDir: true,
+    chunkSizeWarningLimit: 1000
   },
 })
