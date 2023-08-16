@@ -26,8 +26,8 @@ async function initDemonstration(): Promise<any> {
 
     await loadFont();
 
-    if (!shortCode || !durationMs || durationMs < 0) {
-        setMainText("Both code and non-zero durationMs must be provided")
+    if (!shortCode || !durationMs || durationMs < 0 || 10000 < durationMs) {
+        setMainText("Both code and durationMs (between 0 and 10000) must be provided")
         return;
     }
 
