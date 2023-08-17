@@ -58,7 +58,7 @@ function displayForReadableTime(str: string, scene: Scene,
 
 // promise definitions
 function loadFont() {
-    if (font != null) return;
+    if (font) return;
 
     return new Promise((resolve) => {
         const fontLoader = new FontLoader();

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { frameListeners, hands } from "./init";
+import { frameListeners, hands, scene } from "./init";
 import { TextGeometryParameters } from "three/examples/jsm/geometries/TextGeometry";
 import { Font } from "three/examples/jsm/loaders/FontLoader";
 import { getCenteredText } from "./text_display";
@@ -7,6 +7,11 @@ import { getCenteredText } from "./text_display";
 const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.4, transparent: true });
 const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
+
+export type InteractObject = {
+    delete: () => any,
+    completion: Promise<string>
+}
 
 /**
  * An object which describes the text displayed above an interactBox 
@@ -32,17 +37,17 @@ type interactText = {
 /**
  * Places a box inside the scene for the user to interact with. The function
  * returns a promise that resolves once the box has been activated
- * @param scene The scene in which to place the interactBox
+ * @param name The name of the button
  * @param text The {@link interactText} which describes the text on this box 
  * @returns An object with a `delete` function and a `completion` 
- * {@link Promise} that resolves with `true` once the box has 
+ * {@link Promise} that resolves with the name of the box once the box has 
  * been actived, i.e. once the user has placed their hands inside the box, 
  * waited for it to turn green, then removed their hands. 
  * 
- * It resolves with `false` if the box is cancelled, by calling the `delete` 
+ * It resolves with `null` if the box is cancelled, by calling the `delete` 
  * function,
  */
-function createInteractBox(scene: THREE.Scene, text: interactText = null): { delete: () => void, completion: Promise<boolean> }{
+function createInteractBox(name: string, text: interactText = null): InteractObject{
     const textProperties: TextGeometryParameters = {
         font: text.font,
         size: 0.05,
@@ -70,7 +75,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): { del
     scene.add(cube)
     scene.add(wireframe);
 
-    let resolveFunc: (value: boolean) => void;
+    let resolveFunc: (value: string) => void;
 
     const clearText = () => {
         if (textMesh) scene.remove(textMesh);
@@ -84,7 +89,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): { del
     }
 
 
-    const promise: Promise<boolean> = new Promise(resolve => {
+    const promise: Promise<string> = new Promise(resolve => {
         resolveFunc = resolve;
         
         // Create the cube itself
@@ -102,7 +107,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): { del
         let startTime: number;
         let primed = false;
 
-        frameListeners["button"] = {
+        frameListeners[name] = {
             fcn: () => {
                 handsInsideLastFrame = handsInside;
                 handsInside = handsInBox(hands, box);
@@ -145,7 +150,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): { del
 
         function onPress() {
             deleteBox();
-            resolve(true);
+            resolve(name);
         }
 
 
@@ -169,7 +174,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): { del
         completion: promise,
         delete: () => {
             deleteBox();
-            resolveFunc(false);
+            resolveFunc(null);
         },
     };
 }

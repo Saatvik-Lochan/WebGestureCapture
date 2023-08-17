@@ -1,18 +1,27 @@
-import { backend_url } from "./http_handler"
+import { VRButton } from "three/examples/jsm/webxr/VRButton";
+import { createUndoButton } from "./clickable";
+import { animate, initScene, renderer } from "./init";
+import { loadFont } from "./text_display";
 
-async function sendFormData() {
-    var binary = new Uint8Array(2)
-    binary[0] = 65
-    binary[1] = 66
-
-    var fd = new FormData()
-    fd.append('json_data', JSON.stringify({a: 1, b: 2}))
-    fd.append('data', new Blob([binary.buffer]))
-
-    return await fetch(`${backend_url}test/form-data`, {
-        method: 'POST',
-        body: fd
-    })
+export async function test() {
+    await initScene();
+    minimalSetup();
+    animate();
 }
 
-export { sendFormData }
+function minimalSetup() {
+    document.body.appendChild(VRButton.createButton(renderer));
+    renderer.xr.addEventListener('sessionstart', onStart);
+}
+
+async function onStart() {
+    await loadFont();
+    const buttonObj = createUndoButton("name");
+
+    await Promise.any([
+        buttonObj.completion,
+        new Promise(resolve => setTimeout(resolve, 5000))])
+        
+    buttonObj.delete();
+    console.log("completed");
+}

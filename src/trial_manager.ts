@@ -2,22 +2,43 @@ import { WebGLRenderer } from "three";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
-import { createInteractBox } from "./interact_box";
+import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
+import { createUndoButton } from "./clickable";
 
-export async function displaySkipableInstruction(
+export function displaySkipableInstruction(
     instruction: string,
     enterText: string,
     removeText: string,
-    scene: THREE.Scene) {
+    scene: THREE.Scene,
+    name: string = "instruction"): InteractObject {
+
     const textObj = displayStringIndefinitely(instruction, scene);
-    await createInteractBox(scene,
+    const interactBox = createInteractBox(
+        name,
         {
             "enterText": enterText,
             "removeText": removeText,
             font
-        }).completion;
-    clearDisplayIndefinitely(textObj, scene);
+        }
+    );
+    
+
+    return {
+        completion: awaitTrigger(),
+        delete: () => {
+            interactBox.delete();
+            clearDisplayIndefinitely(textObj, scene);
+        } 
+    }
+
+    async function awaitTrigger() {
+
+        const completedVal = await interactBox.completion;
+        clearDisplayIndefinitely(textObj, scene);
+        return completedVal;
+    }
+
 }
 
 export async function performTrial(
@@ -64,9 +85,6 @@ export async function performTrial(
 async function startDemonstrationIfExists(project_name: string, gesture_id: string, demonstration: GestureDemonstration) {
     const demonstrationData = await getDemonstration(project_name, gesture_id);
 
-    console.log('%ctrial_manager.ts line:68 gesture_id', 'color: #007acc;', gesture_id);
-    console.log('%ctrial_manager.ts line:69 project_name', 'color: #007acc;', project_name);
-
     if (demonstrationData) {
         console.log('%ctrial_manager.ts line:72 demonstrationData', 'color: #007acc;', demonstrationData);
         demonstration.load(demonstrationData)
@@ -79,20 +97,41 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, 
 
     startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
 
-    await displaySkipableInstruction(
+    const instructions = displaySkipableInstruction(
         gesture.instruction,
         "Place your hands in the box when ready",
         "Remove your hands to start recording",
-        scene);
+        scene, "next");
+
+    const undo = createUndoButton("undo");
+
+    const result = await Promise.any([
+        instructions.completion,
+        undo.completion
+    ])
 
     demonstration.stopPlayback();
 
-    const durationMs = gesture.duration * 1000;
-    await Promise.all([
-        startAndStreamHandDataToMain(durationMs, renderer, gestureLocator),
-        displayString(`recording gesture for ${gesture.duration}s`, durationMs, scene)
-    ]);
+    switch (result) {
+        case "next":
+            undo.delete();
 
-    // playBeep(audio);
-    await new Promise(resolve => setTimeout(resolve, 500));
+            const durationMs = gesture.duration * 1000;
+            await Promise.all([
+                startAndStreamHandDataToMain(durationMs, renderer, gestureLocator),
+                displayString(`recording gesture for ${gesture.duration}s`, durationMs, scene)
+            ]);
+            break;
+        case "undo":
+            instructions.delete();
+
+            await performGesture(
+                gesture,
+                gestureLocator,
+                scene,
+                renderer,
+                demonstration
+            );
+    }
+
 }
