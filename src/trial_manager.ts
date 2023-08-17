@@ -2,7 +2,7 @@ import { WebGLRenderer } from "three";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
-import { createInteractBox } from "./interact";
+import { createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
 
 export async function displaySkipableInstruction(
