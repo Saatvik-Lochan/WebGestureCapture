@@ -16,7 +16,7 @@ export async function displaySkipableInstruction(
             "enterText": enterText,
             "removeText": removeText,
             font
-        });
+        }).completion;
     clearDisplayIndefinitely(textObj, scene);
 }
 
