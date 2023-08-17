@@ -67,7 +67,6 @@ export class ClickableButton {
     #button: Object3D = getCube(buttonMaterial, buttonDimensions);
 
     #onPress: () => any;
-    
 
     #restingYValues = { 
         unpressed: baseDimensions.height / 2 + this.#buttonHeight / 2,

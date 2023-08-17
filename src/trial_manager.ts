@@ -62,9 +62,6 @@ export async function performTrial(
 
     for (let askGestureIndex = 0; askGestureIndex < trialToPerform.gestures.length;) {
         const gestureToPerform = trialToPerform.gestures[askGestureIndex];
-        
-        console.log('%ctrial_manager.ts line:64 i', 'color: #007acc;', askGestureIndex);
-        console.log('%ctrial_manager.ts line:68 offerRedo', 'color: #007acc;', offerRedo);
 
         const record = await displayGestureInstructions(
             gestureToPerform,
