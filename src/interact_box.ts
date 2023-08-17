@@ -34,11 +34,15 @@ type interactText = {
  * returns a promise that resolves once the box has been activated
  * @param scene The scene in which to place the interactBox
  * @param text The {@link interactText} which describes the text on this box 
- * @returns A {@link Promise} that resolves in `undefined` once the box has 
+ * @returns An object with a `delete` function and a `completion` 
+ * {@link Promise} that resolves with `true` once the box has 
  * been actived, i.e. once the user has placed their hands inside the box, 
- * waited for it to turn green, then removed their hands.
+ * waited for it to turn green, then removed their hands. 
+ * 
+ * It resolves with `false` if the box is cancelled, by calling the `delete` 
+ * function,
  */
-function createInteractBox(scene: THREE.Scene, text: interactText = null): Promise<undefined> {
+function createInteractBox(scene: THREE.Scene, text: interactText = null): { delete: () => void, completion: Promise<boolean> }{
     const textProperties: TextGeometryParameters = {
         font: text.font,
         size: 0.05,
@@ -49,24 +53,41 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): Promi
         bevelSegments: 3
     }
 
-    let textMesh;
+    let textMesh: THREE.Object3D<THREE.Event>;
 
-    return new Promise(resolve => {
+    const cubeGeom = new THREE.BoxGeometry(1, 0.4, 1);
+    const cube = new THREE.Mesh(cubeGeom, blueMaterial);
+
+    // Also add a wireframe to the cube to better see the depth
+    const _wireframe = new THREE.EdgesGeometry(cubeGeom);
+    const wireframe = new THREE.LineSegments(_wireframe);
+
+    // Rotate it a little for a better vantage point
+    cube.position.set(0, 0.4, -0.1);
+    wireframe.position.set(0, 0.4, -0.1);
+
+    // add to scene
+    scene.add(cube)
+    scene.add(wireframe);
+
+    let resolveFunc: (value: boolean) => void;
+
+    const clearText = () => {
+        if (textMesh) scene.remove(textMesh);
+    }
+
+    const deleteBox = () => {
+        scene.remove(cube);
+        scene.remove(wireframe)
+        clearText();
+        delete frameListeners["button"];
+    }
+
+
+    const promise: Promise<boolean> = new Promise(resolve => {
+        resolveFunc = resolve;
+        
         // Create the cube itself
-        const cubeGeom = new THREE.BoxGeometry(1, 0.4, 1);
-        const cube = new THREE.Mesh(cubeGeom, blueMaterial);
-
-        // Also add a wireframe to the cube to better see the depth
-        const _wireframe = new THREE.EdgesGeometry(cubeGeom);
-        const wireframe = new THREE.LineSegments(_wireframe);
-
-        // Rotate it a little for a better vantage point
-        cube.position.set(0, 0.4, -0.1);
-        wireframe.position.set(0, 0.4, -0.1);
-
-        // add to scene
-        scene.add(cube)
-        scene.add(wireframe);
 
         const box = new THREE.Box3();
         box.setFromObject(cube);
@@ -78,7 +99,7 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): Promi
         const timeThreshold = 750;
         let handsInside = false;
         let handsInsideLastFrame = false;
-        let startTime;
+        let startTime: number;
         let primed = false;
 
         frameListeners["button"] = {
@@ -123,16 +144,10 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): Promi
         }
 
         function onPress() {
-            clearText();
             deleteBox();
-            delete frameListeners["button"];
+            resolve(true);
         }
 
-        function deleteBox() {
-            scene.remove(cube);
-            scene.remove(wireframe)
-            resolve(undefined);
-        }
 
         function updateText(str: string) {
             clearText();
@@ -148,11 +163,15 @@ function createInteractBox(scene: THREE.Scene, text: interactText = null): Promi
                 scene.add(textMesh);
             }
         }
+    });
 
-        function clearText() {
-            if (textMesh) scene.remove(textMesh);
-        }
-    })
+    return { 
+        completion: promise,
+        delete: () => {
+            deleteBox();
+            resolveFunc(false);
+        },
+    };
 }
 
 /**
