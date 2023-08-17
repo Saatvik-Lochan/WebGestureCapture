@@ -52,7 +52,7 @@ async function startDemonstrationRecording(shortCode: string, durationMs: number
 Put your hands in the box and follow the instructions`,
         "Place your whole hands in the box",
         "Remove your hands to start recording",
-        scene);
+        scene).completion;
 
     await Promise.all([
         streamHandDataDemonstration(durationMs, renderer, shortCode),

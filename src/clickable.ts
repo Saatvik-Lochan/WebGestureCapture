@@ -7,8 +7,8 @@ import { InteractObject } from "./interact_box";
 
 type BoxDimensions = { width: number, height: number, depth: number }
 
-const baseMaterial = new MeshBasicMaterial({ color: 0xf0a267 });
-const buttonMaterial = new MeshBasicMaterial({ color: 0xfaf1eb });
+const baseMaterial = new MeshBasicMaterial({ color: 0x1cb3ff });
+const buttonMaterial = new MeshBasicMaterial({ color: 0xde001a });
 
 const baseDimensions: BoxDimensions = {
     width: 0.1,
@@ -49,7 +49,6 @@ function getButtonText(buttonText: ButtonTextProperties, baseDimensions: BoxDime
         .add(new Vector3(0, baseDimensions.height / 2, - baseDimensions.depth / 2));
 
     scene.add(textMesh)
-    console.log(`Added text to scene ${textMesh.position.toArray()}`)
     return textMesh;
 }
 
@@ -94,7 +93,6 @@ export class ClickableButton {
         this.#base.applyMatrix4(transformMatrix);
 
         this.#onPress = onPress;
-        console.log(this.#button.position.y);
         this.startUpdate();
     }
 
@@ -155,7 +153,7 @@ export function createUndoButton(name: string): InteractObject {
         resolveFunc = resolve;
 
         const transformMatrix = new Matrix4();
-        transformMatrix.makeTranslation(0.4, 0.75, -0.45)
+        transformMatrix.makeTranslation(0.5, 0.75, -0.45)
         transformMatrix.multiply(new Matrix4().makeRotationY(-0.6));
 
         const button = new ClickableButton(

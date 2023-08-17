@@ -101,7 +101,7 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
             updateText(text.enterText);
         }
 
-        const timeThreshold = 750;
+        const timeThreshold = 250;
         let handsInside = false;
         let handsInsideLastFrame = false;
         let startTime: number;
@@ -132,7 +132,7 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
                     }
                 }
             },
-            t: 5
+            t: 2
         }
 
         function onHandsFirstEnter() {
