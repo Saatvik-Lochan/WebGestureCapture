@@ -22,14 +22,14 @@ export function displaySkipableInstruction(
             font
         }
     );
-    
+
 
     return {
         completion: awaitTrigger(),
         delete: () => {
             interactBox.delete();
             clearDisplayIndefinitely(textObj, scene);
-        } 
+        }
     }
 
     async function awaitTrigger() {
@@ -47,6 +47,7 @@ export async function performTrial(
     renderer: WebGLRenderer,
     project_name: string,
     participant_id: string) {
+
     await loadFont();
     console.log("trial started");
     await displaySkipableInstruction(
@@ -68,7 +69,7 @@ export async function performTrial(
             getGestureLocator(askGestureIndex),
             scene,
             demonstration,
-            offerRedo  
+            offerRedo
         );
 
         if (record) {
@@ -85,10 +86,10 @@ export async function performTrial(
 
             offerRedo = false;
             askGestureIndex--;
-        } 
-        
+        }
+
     }
-    
+
     function getGestureLocator(gesture_index: number): GestureLocator {
         return {
             project_name,
@@ -114,9 +115,9 @@ async function startDemonstrationIfExists(project_name: string, gesture_id: stri
 }
 
 async function displayGestureInstructions(
-    gesture: Gesture, 
-    gestureLocator: GestureLocator, 
-    scene: Scene, 
+    gesture: Gesture,
+    gestureLocator: GestureLocator,
+    scene: Scene,
     demonstration: GestureDemonstration,
     offerRedo = false) {
     startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
@@ -131,12 +132,12 @@ async function displayGestureInstructions(
 
     if (offerRedo) {
         const undo = createUndoButton("undo");
-    
+
         result = await Promise.any([
             instructions.completion,
             undo.completion
         ]);
-    
+
         console.log('%ctrial_manager.ts line:143 result', 'color: #007acc;', result);
 
         switch (result) {
