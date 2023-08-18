@@ -155,10 +155,10 @@ export function multiChoiceButtons(buttonsParams: ButtonParams[]): InteractObjec
 
     return {
         delete: () => Object.values(buttons).forEach(button => button.delete()),
-        completion: buttonpPressed(buttons)
+        completion: buttonPressed(buttons)
     }
 
-    async function buttonpPressed(buttons: Record<string, InteractObject>) {
+    async function buttonPressed(buttons: Record<string, InteractObject>) {
         const first = await Promise.any(Object.values(buttons).map(button => button.completion));
         Object.keys(buttons).forEach(name => { if (name != first) buttons[name].delete() });
 
