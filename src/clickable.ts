@@ -7,8 +7,8 @@ import { InteractObject } from "./interact_box";
 
 type BoxDimensions = { width: number, height: number, depth: number }
 
-const baseMaterial = new MeshBasicMaterial({ color: 0x1cb3ff });
-const buttonMaterial = new MeshBasicMaterial({ color: 0xde001a });
+const baseMaterial = new MeshBasicMaterial({ color: 0xa881af });
+const buttonMaterial = new MeshBasicMaterial({ color: 0x4681f4 });
 
 const baseDimensions: BoxDimensions = {
     width: 0.1,
