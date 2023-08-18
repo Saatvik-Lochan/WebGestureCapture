@@ -51,8 +51,7 @@ async function startDemonstrationRecording(shortCode: string, durationMs: number
         `About to record gesture with id ${locator.gesture_id} for ${locator.project_name}.
 Put your hands in the box and follow the instructions`,
         "Place your whole hands in the box",
-        "Remove your hands to start recording",
-        scene).completion;
+        "Remove your hands to start recording").completion;
 
     await Promise.all([
         streamHandDataDemonstration(durationMs, renderer, shortCode),
