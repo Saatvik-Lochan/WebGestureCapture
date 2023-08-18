@@ -159,7 +159,7 @@ export async function captureHandSequence(durationMs: number, renderer: WebGLRen
  * which project to register the demonstration data with.
  */
 export async function streamHandDataDemonstration(durationMs: number, renderer: WebGLRenderer, shortCode: string) {
-	const sendFcn = (captured: handFrame[]) => sendDemonstrationBatch(capturedToBuffer(captured), shortCode);
+	const sendFcn = async (captured: handFrame[]) => sendDemonstrationBatch(capturedToBuffer(captured), shortCode);
 	await streamHandData(durationMs, renderer, sendFcn);
 }
 
@@ -174,7 +174,7 @@ export async function streamHandDataDemonstration(durationMs: number, renderer: 
  * to send the data for this gesture instance.
  */
 export async function startAndStreamHandDataToMain(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator) {
-	const sendFcn = (captured: handFrame[]) => sendHandGestureBatch(capturedToBuffer(captured), gestureLocator);
+	const sendFcn = async (captured: handFrame[]) => sendHandGestureBatch(capturedToBuffer(captured), gestureLocator);
 
 	await startHandGestureTransfer(gestureLocator);
 	await streamHandData(durationMs, renderer, sendFcn);
@@ -209,7 +209,7 @@ export function capturedToBuffer(captureData: handFrame[]): handArrayBuffer {
  * to grab the {@link XRHandSpace | hand spaces} of the current user
  * @param sendFcn The function which is used to consume the data. The input
  * for this function will be a `handFrame[]` which consists of 
- * {@link blockSize} number of {@link handFrame}.
+ * {@link blockSize} number of {@link handFrame}. This should ideally be `async`
  * @param blockSize The number of frames captured before `sendFcn` consumes them.
  * @param name The name of the frame listener to attach this function to. 
  * Ensure it is unique.
@@ -243,10 +243,10 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer,
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
 	delete frameListeners[name];
-	sendCaptured();
+	await sendCaptured();
 
-	function sendCaptured() {
-		sendFcn(capturedData);
+	async function sendCaptured() {
+		await sendFcn(capturedData);
 		capturedData = [];
 	}
 }

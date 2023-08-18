@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/examples/jsm/webxr/XRHandModelFactory.js";
-import { backend_url, setBackendUrl } from "./http_handler";
+import { setBackendUrl } from "./http_handler";
 
 // main resources
 /**
