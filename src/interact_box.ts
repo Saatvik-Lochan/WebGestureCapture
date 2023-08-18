@@ -8,8 +8,19 @@ const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.
 const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
 
+/**
+ * A representation of an interactable object which has a single `activation`
+ */
 export type InteractObject = {
+    /**
+     * A function which when called, clears this `InteractObject`
+     */
     delete: () => any,
+
+    /**
+     * A `Promise` that resolves with a `string` that can be used to identify
+     * the object. It resolves when the `InteractObject` is activated
+     */
     completion: Promise<string>
 }
 
