@@ -1,16 +1,16 @@
-import { Scene, WebGLRenderer } from "three";
+import { WebGLRenderer } from "three";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
 import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
 import { createUndoButton } from "./clickable";
+import { renderer, scene } from "./init";
 
 export function displaySkipableInstruction(
     instruction: string,
     enterText: string,
     removeText: string,
-    scene: THREE.Scene,
     name: string = "instruction"): InteractObject {
 
     const textObj = displayStringIndefinitely(instruction, scene);
@@ -43,8 +43,6 @@ export function displaySkipableInstruction(
 
 export async function performTrial(
     trialToPerform: Trial,
-    scene: THREE.Scene,
-    renderer: WebGLRenderer,
     project_name: string,
     participant_id: string) {
 
@@ -53,8 +51,7 @@ export async function performTrial(
     await displaySkipableInstruction(
         trialToPerform.instructions,
         "Place your hands inside the box when ready",
-        "Remove your hands to continue",
-        scene).completion;
+        "Remove your hands to continue").completion;
 
     const demonstration = new GestureDemonstration(trialToPerform.trial_name);
 
@@ -67,7 +64,6 @@ export async function performTrial(
         const record = await displayGestureInstructions(
             gestureToPerform,
             getGestureLocator(askGestureIndex),
-            scene,
             demonstration,
             offerRedo
         );
@@ -75,9 +71,7 @@ export async function performTrial(
         if (record) {
             await performGesture(
                 gestureToPerform,
-                getGestureLocator(askGestureIndex),
-                scene,
-                renderer,
+                getGestureLocator(askGestureIndex)
             );
 
             offerRedo = true;
@@ -117,7 +111,6 @@ async function startDemonstrationIfExists(project_name: string, gesture_id: stri
 async function displayGestureInstructions(
     gesture: Gesture,
     gestureLocator: GestureLocator,
-    scene: Scene,
     demonstration: GestureDemonstration,
     offerRedo = false) {
     startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
@@ -126,7 +119,7 @@ async function displayGestureInstructions(
         gesture.instruction,
         "Place your hands in the box when ready",
         "Remove your hands to start recording",
-        scene, "next");
+        "next");
 
     let result: string;
 
@@ -156,7 +149,7 @@ async function displayGestureInstructions(
     return result == "next";
 }
 
-async function performGesture(gesture: Gesture, gestureLocator: GestureLocator, scene: THREE.Scene, renderer: WebGLRenderer) {
+async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
     const durationMs = gesture.duration * 1000;
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, renderer, gestureLocator),

@@ -42,7 +42,7 @@ async function initProject() {
                     message = "You have pending trials. Click 'Enter VR' to start"
 
                     renderer.xr.addEventListener('sessionstart', () => {
-                        performTrial(trial, scene, renderer, project, participant)
+                        performTrial(trial, project, participant)
                     });
                     renderer.xr.addEventListener('sessionend', () => {
                         location.reload();
