@@ -1,10 +1,9 @@
-import { WebGLRenderer } from "three";
 import { startAndStreamHandDataToMain } from "./hand_capture";
 import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
 import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
-import { createUndoButton } from "./clickable";
+import { createUndoButton, triChoiceButtons } from "./clickable";
 import { renderer, scene } from "./init";
 
 export function displaySkipableInstruction(
@@ -56,9 +55,49 @@ export async function performTrial(
     const demonstration = new GestureDemonstration(trialToPerform.trial_name);
 
     // So the first gesture does not present a 'redo' option
-    let offerRedo = false;
+    let askGestureIndex: number, offerRedo: boolean;
 
-    for (let askGestureIndex = 0; askGestureIndex < trialToPerform.gestures.length;) {
+    const startTrialLoop = () => {
+        offerRedo = false;
+        askGestureIndex = 0;
+    }
+
+    const redoPrevious = () => {
+        offerRedo = false;
+        askGestureIndex--;
+    }
+
+    const nextGesture = () => {
+        offerRedo = true;
+        askGestureIndex++;
+    }
+
+    startTrialLoop();
+
+    while (askGestureIndex <= trialToPerform.gestures.length) {
+        // included here so we can redo the last gesture if requested
+        if (askGestureIndex == trialToPerform.gestures.length) {
+            const redoTrialText = "REDO\nTRIAL";
+            const saveText = "SAVE";
+            const redoGestureText = "   REDO\nGESTURE";
+
+            const result = await triChoiceButtons(redoTrialText, redoGestureText, saveText).completion;
+
+            switch (result) {
+                case redoTrialText:
+                    startTrialLoop();
+                    continue;
+                case redoGestureText:
+                    redoPrevious();
+                    continue;
+                default:
+                case saveText:
+                    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
+                    await renderer.xr.getSession().end();
+                    return;
+            }
+        }
+
         const gestureToPerform = trialToPerform.gestures[askGestureIndex];
 
         const record = await displayGestureInstructions(
@@ -74,14 +113,10 @@ export async function performTrial(
                 getGestureLocator(askGestureIndex)
             );
 
-            offerRedo = true;
-            askGestureIndex++;
+            nextGesture();
         } else {
-
-            offerRedo = false;
-            askGestureIndex--;
+            redoPrevious();
         }
-
     }
 
     function getGestureLocator(gesture_index: number): GestureLocator {
@@ -92,10 +127,6 @@ export async function performTrial(
             gesture_index: gesture_index.toFixed(0)
         }
     }
-
-    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
-    await displayString("The trial is over, you may take off the headset", 5000, scene);
-    await renderer.xr.getSession().end();
 }
 
 async function startDemonstrationIfExists(project_name: string, gesture_id: string, demonstration: GestureDemonstration) {

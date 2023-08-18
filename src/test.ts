@@ -1,7 +1,7 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { createUndoButton } from "./clickable";
-import { animate, initScene, renderer } from "./init";
-import { loadFont } from "./text_display";
+import { triChoiceButtons } from "./clickable";
+import { animate, initScene, renderer, scene } from "./init";
+import { clearDisplayIndefinitely, displayStringIndefinitely, loadFont } from "./text_display";
 
 export async function test() {
     await initScene();
@@ -16,12 +16,19 @@ function minimalSetup() {
 
 async function onStart() {
     await loadFont();
-    const buttonObj = createUndoButton("name");
 
-    await Promise.any([
-        buttonObj.completion,
-        new Promise(resolve => setTimeout(resolve, 5000))])
+    let displayString = displayStringIndefinitely("Start", scene);
+
+    for (;;) {
+        const buttonObj = triChoiceButtons("1", "2", "3");
         
-    buttonObj.delete();
-    console.log("completed");
+        const result = await Promise.any([
+            buttonObj.completion,
+        ]);
+        
+        console.log(result)
+        clearDisplayIndefinitely(displayString, scene);
+        displayString = displayStringIndefinitely(result, scene)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 }

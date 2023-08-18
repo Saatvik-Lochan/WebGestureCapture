@@ -105,13 +105,15 @@ let frameListeners: Record<string, frameListener> = {};
  * ```
  */
 async function initScene() {
-    initRenderer();
-    initCameraAndScene();
-    initAudio();
-    initHands();
+    await Promise.all([
+        initRenderer(),
+        initCameraAndScene(),
+        initAudio(),
+        initHands()
+    ]);
 
 
-    function initRenderer() {
+    async function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.xr.enabled = true;
@@ -119,19 +121,19 @@ async function initScene() {
         document.body.appendChild(renderer.domElement);
     }
 
-    function initCameraAndScene() {
+    async function initCameraAndScene() {
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50);
         scene = new THREE.Scene();
         scene.add(new THREE.HemisphereLight(0xbcbcbc, 0xa5a5a5, 3));
     }
 
-    function initAudio() {
+    async function initAudio() {
         const listener = new THREE.AudioListener();
         camera.add(listener);
         audio = new THREE.Audio(listener);
     }
 
-    function initHands() {
+    async function initHands() {
         const handModelFactory = new XRHandModelFactory();
 
         function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
