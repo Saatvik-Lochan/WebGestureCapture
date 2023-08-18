@@ -145,7 +145,7 @@ async function initScene() {
             return outHand;
         }
 
-        hands = [0, 1].map((ele) => initHand(ele, "spheres"));
+        hands = [0, 1].map((ele) => initHand(ele, "mesh"));
     }
 }
 
