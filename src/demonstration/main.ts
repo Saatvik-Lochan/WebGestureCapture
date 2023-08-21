@@ -54,7 +54,7 @@ Put your hands in the box and follow the instructions`,
         "Remove your hands to start recording").completion;
 
     await Promise.all([
-        streamHandDataDemonstration(durationMs, renderer, shortCode),
+        streamHandDataDemonstration(durationMs, shortCode),
         displayString(`recording gesture demonstration for ${durationMs / 1000}s`,
             durationMs,
             scene)

@@ -121,7 +121,7 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
         frameListeners[name] = {
             fcn: () => {
                 handsInsideLastFrame = handsInside;
-                handsInside = handsInBox(hands, box);
+                handsInside = handsInBox(Object.values(hands), box);
 
                 if (handsInside) {
                     if (handsInsideLastFrame) {

@@ -183,7 +183,7 @@ async function displayGestureInstructions(
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
     const durationMs = gesture.duration * 1000;
     await Promise.all([
-        startAndStreamHandDataToMain(durationMs, renderer, gestureLocator),
+        startAndStreamHandDataToMain(durationMs, gestureLocator),
         displayString(`recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
 }

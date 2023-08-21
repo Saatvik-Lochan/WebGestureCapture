@@ -1,5 +1,5 @@
 import { Clock, XRHandSpace, WebGLRenderer } from "three";
-import { frameListener, frameListeners } from "./init";
+import { frameListener, frameListeners, hands } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 /**
@@ -76,8 +76,8 @@ export const indexToJointName = [
  * 
  * @deprecated
  */
-function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
-	const arrayData = getHandDataAsArray(renderer, clock);
+function getHandDataAsString(clock: Clock) {
+	const arrayData = getHandDataAsArray(clock);
 	const stringData = arrayData.map(element => element.toFixed(6)).join(",")
 
 	return stringData;
@@ -90,11 +90,12 @@ function getHandDataAsString(renderer: WebGLRenderer, clock: Clock) {
  * @param clock A {@link Clock} used to record `startTime` and the `endTime`
  * @returns a {@link handFrame | frame} of hand gesture data
  */
-function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): handFrame {
-	const hand0 = renderer.xr.getHand(0);
-	const hand1 = renderer.xr.getHand(1);
+function getHandDataAsArray(clock: Clock): handFrame {
+	const leftHand = hands["left"];
+	const rightHand = hands["right"];
 
-	function getJointAsArr(handObj: XRHandSpace, jointName: string) {
+
+	function getJointAsArr(handObj: XRHandSpace, jointName: string): number[] {
 		const poseArray =
 			[...handObj.joints[jointName].position.toArray(),
 			...handObj.joints[jointName].quaternion.toArray()];
@@ -102,8 +103,10 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): handFrame {
 		return poseArray;
 	}
 
-	function getHandAsArray(handObj: XRHandSpace) {
-		let out_arr = [];
+	function getHandAsArray(handObj: XRHandSpace): number[] {
+		if (!handObj) return Array(25).fill(NaN);
+
+		let out_arr: number[] = [];
 		for (let i = 0; i <= 24; i++) {
 			out_arr = [...out_arr, ...getJointAsArr(handObj, indexToJointName[i])];
 		}
@@ -111,12 +114,11 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): handFrame {
 	}
 
 	const captureStartTime = clock.getElapsedTime();
-	const capturedData = [...getHandAsArray(hand0), ...getHandAsArray(hand1)];
+	const capturedData =  getHandAsArray(leftHand).concat(getHandAsArray(rightHand));
 	const captureEndTime = clock.getElapsedTime();
 
-	const finalData = [...capturedData, captureStartTime, captureEndTime];
-
-	return finalData;
+	capturedData.push(captureStartTime, captureEndTime);
+	return capturedData;
 }
 
 /**
@@ -132,13 +134,13 @@ function getHandDataAsArray(renderer: WebGLRenderer, clock: Clock): handFrame {
  * @returns An array of arrays. Each sub-array contains a single frame of data as captured
  * by {@link getHandDataAsArray}.
  */
-export async function captureHandSequence(durationMs: number, renderer: WebGLRenderer): Promise<handFrame[]> {
+export async function captureHandSequence(durationMs: number): Promise<handFrame[]> {
 	// setting as 0 for now
 	const clock = new Clock(true);
 	const capturedData: handFrame[] = [];
 
 	frameListeners[0] = {
-		fcn: () => capturedData.push(getHandDataAsArray(renderer, clock)),
+		fcn: () => capturedData.push(getHandDataAsArray(clock)),
 		t: 1
 	}
 
@@ -158,9 +160,9 @@ export async function captureHandSequence(durationMs: number, renderer: WebGLRen
  * @param shortCode A short string used to describe which gesture class in 
  * which project to register the demonstration data with.
  */
-export async function streamHandDataDemonstration(durationMs: number, renderer: WebGLRenderer, shortCode: string) {
+export async function streamHandDataDemonstration(durationMs: number, shortCode: string) {
 	const sendFcn = async (captured: handFrame[]) => sendDemonstrationBatch(capturedToBuffer(captured), shortCode);
-	await streamHandData(durationMs, renderer, sendFcn);
+	await streamHandData(durationMs, sendFcn);
 }
 
 /**
@@ -173,11 +175,11 @@ export async function streamHandDataDemonstration(durationMs: number, renderer: 
  * @param gestureLocator An instance of {@link GestureLocator} to identify where
  * to send the data for this gesture instance.
  */
-export async function startAndStreamHandDataToMain(durationMs: number, renderer: WebGLRenderer, gestureLocator: GestureLocator) {
+export async function startAndStreamHandDataToMain(durationMs: number, gestureLocator: GestureLocator) {
 	const sendFcn = async (captured: handFrame[]) => sendHandGestureBatch(capturedToBuffer(captured), gestureLocator);
 
 	await startHandGestureTransfer(gestureLocator);
-	await streamHandData(durationMs, renderer, sendFcn);
+	await streamHandData(durationMs, sendFcn);
 }
 
 /**
@@ -219,7 +221,7 @@ export function capturedToBuffer(captureData: handFrame[]): handArrayBuffer {
  * @param offset The offset number of frames before recording starts. This must be 
  * less than `timePeriod`. See {@link frameListener}.
  */
-async function streamHandData(durationMs: number, renderer: WebGLRenderer,
+async function streamHandData(durationMs: number,
 	sendFcn: (data: handFrame[]) => any, blockSize: number = 1000, 
 	name: string = "captureHands",
 	timePeriod: number = 1,
@@ -231,7 +233,7 @@ async function streamHandData(durationMs: number, renderer: WebGLRenderer,
 
 	frameListeners[name] = {
 		fcn: () => {
-			capturedData.push(getHandDataAsArray(renderer, clock));
+			capturedData.push(getHandDataAsArray(clock));
 
 			if (capturedData.length >= blockSize) {
 				sendCaptured();

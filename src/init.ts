@@ -29,7 +29,7 @@ let audio: THREE.Audio;
  * @remarks This does not include the demonstration ghost hands
  * @remarks This is not used in the capture of hand data
  */
-let hands: THREE.XRHandSpace[]; 
+let hands: Record<XRHandedness, THREE.XRHandSpace>; 
 
 /**
  * An object used to record information on functions to be run regularly in 
@@ -136,16 +136,24 @@ async function initScene() {
     async function initHands() {
         const handModelFactory = new XRHandModelFactory();
 
-        function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
+        async function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
             const outHand = renderer.xr.getHand(index);
+
             scene.add(outHand);
 
             const handModel = handModelFactory.createHandModel(outHand, type);
             outHand.add(handModel);
-            return outHand;
+
+            const handedness: XRHandedness = 
+                await new Promise(resolve => outHand.addEventListener('connected', event => {
+                    const xrInputSource = event.data;
+                    resolve(xrInputSource.handedness);
+            }));
+
+            return [handedness, outHand];
         }
 
-        hands = [0, 1].map((ele) => initHand(ele, "mesh"));
+        hands = Object.fromEntries(await Promise.all([0, 1].map(ele => initHand(ele, "mesh"))));
     }
 }
 
