@@ -221,7 +221,7 @@ export function addBothGhostHands() {
  * @param handedness Whether the created hand should be left or right handed
  * @returns A {@link GhostHandSpace} representing a hand
  */
-function addGhostHand(handedness: "left" | "right") {
+function addGhostHand(handedness: XRHandedness) {
     const hand = getNewHand();
     const handModel = new GhostHandModel(hand);
     const primitiveModel = new XRHandMeshModel(handModel, hand, null, handedness);
