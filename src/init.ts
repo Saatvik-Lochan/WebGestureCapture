@@ -87,6 +87,7 @@ let frameListeners: Record<string, frameListener> = {};
 /**
  * Instantiates the scene. This must be run to use {@link scene}, {@link renderer},
  * {@link camera}, {@link audio}, {@link hands}.
+ * s
  * 
  * @remarks This does not set up the VR Button, or bind to 
  * the vr `startsession`. However, it does enable vr.
@@ -109,9 +110,10 @@ async function initScene() {
         initRenderer(),
         initCameraAndScene(),
         initAudio(),
-        initHands()
     ]);
-
+    
+    // will only resolve once xr has been opened and hands are connected
+    initHands()
 
     async function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -154,6 +156,7 @@ async function initScene() {
         }
 
         hands = Object.fromEntries(await Promise.all([0, 1].map(ele => initHand(ele, "mesh"))));
+        console.log(hands);
     }
 }
 

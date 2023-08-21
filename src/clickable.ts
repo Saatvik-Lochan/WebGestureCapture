@@ -83,7 +83,7 @@ export class ClickableButton {
         onPress: () => any) {
 
         this.name = name;
-        this.#hands = hands.map(hand => new OculusHandModel(hand));
+        this.#hands = Object.values(hands).map(hand => new OculusHandModel(hand));
         const text = getButtonText(buttonText, baseDimensions);
 
         this.#base.add(this.#button);
