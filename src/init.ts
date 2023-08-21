@@ -156,7 +156,6 @@ async function initScene() {
         }
 
         hands = Object.fromEntries(await Promise.all([0, 1].map(ele => initHand(ele, "mesh"))));
-        console.log(hands);
     }
 }
 
