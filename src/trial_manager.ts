@@ -1,5 +1,5 @@
 import { startAndStreamHandDataToMain } from "./hand_capture";
-import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
+import { clearDisplayIndefinitely, countDown, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
 import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
@@ -184,6 +184,7 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) 
     const durationMs = gesture.duration * 1000;
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
+        countDown(durationMs / 1000, 1, scene, 0),
         displayString(`recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
 }

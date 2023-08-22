@@ -115,6 +115,10 @@ export class ClickableButton {
         return this.#deleted;
     }
 
+    loadOnPressed(func: () => any) {
+        this.#onPress = func;
+    }
+
     update() {
         if (this.#deleted) return;
 
@@ -128,7 +132,6 @@ export class ClickableButton {
 
             if (furthestY <= this.#restingYValues.pressed) {
                 this.#onPress();
-                this.deleteButton();
             } else {
                 this.#button.position.y = Math.min(furthestY, this.#restingYValues.unpressed);
             }
@@ -179,14 +182,20 @@ export function createButton(buttonParams: ButtonParams): InteractObject {
             resolveFunc = resolve;
 
             const name = getNameFrom(buttonParams);
-
+            
             const button = new ClickableButton(
                 name,
                 { buttonText: buttonParams.text, font },
                 buttonParams.transform,
-                () => resolve(name)
+                () => {}
             );
 
+            const onPress = () => {
+                button.deleteButton();
+                resolve(name);
+            }
+
+            button.loadOnPressed(onPress);
             deleteButtonFunc = () => button.deleteButton();
         })
     };
