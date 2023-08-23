@@ -264,8 +264,8 @@ export function dualChoiceButtons(text1: string, text2: string): InteractObject 
 
 export function createUndoButton(name: string, text = "REDO"): InteractObject {
     const transform = new Matrix4();
-    transform.makeTranslation(0.45, 0.75, -0.4)
-    transform.multiply(new Matrix4().makeRotationY(-0.8));
+    transform.makeTranslation(0.5, 0.75, -0.35)
+    transform.multiply(new Matrix4().makeRotationY(-0.9));
 
     return createButton({ name, text, transform });
 }

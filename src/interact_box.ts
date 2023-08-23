@@ -74,7 +74,7 @@ function createInteractBox(name: string, text: interactText): InteractObject{
 
     let textMesh: THREE.Object3D<THREE.Event>;
 
-    const cubeGeom = new BoxGeometry(1, 0.4, 1);
+    const cubeGeom = new BoxGeometry(0.7, 0.4, 1);
     const cube = new Mesh(cubeGeom, blueMaterial);
 
     // add a wireframe to the cube to better see the depth
@@ -119,11 +119,12 @@ function createInteractBox(name: string, text: interactText): InteractObject{
     let resolveFunc: (value: string) => void;
 
     const incButtonTransform = new Matrix4();
-    incButtonTransform.makeTranslation(-0.4, 0.75, -0.35)
+    incButtonTransform.makeTranslation(-0.5, 0.75, -0.35)
     incButtonTransform.multiply(new Matrix4().makeRotationY(0.9));
 
     const decButtonTransform = incButtonTransform.clone();
-    decButtonTransform.multiply(new Matrix4().makeTranslation(-0.3, 0, 0));
+    decButtonTransform.makeTranslation(-0.5, 0.75, -0.20)
+    decButtonTransform.multiply(new Matrix4().makeRotationY(0.9));
 
     const incButton = new ClickableButton(
         "increase height",
