@@ -133,7 +133,7 @@ export class ClickableButton {
 
             if (furthestY <= this.#restingYValues.pressed) {
                 this.#button.position.y = this.#restingYValues.pressed;
-                
+
                 if (this.#primed) {
                     this.#primed = false;
                     this.#onPress();
@@ -145,7 +145,8 @@ export class ClickableButton {
                 this.#button.position.y = furthestY;
             }
         } else {
-            this.#button.position.y = this.#restingYValues.unpressed;        }
+            this.#button.position.y = this.#restingYValues.unpressed;
+        }
 
     }
 }
@@ -190,12 +191,12 @@ export function createButton(buttonParams: ButtonParams): InteractObject {
             resolveFunc = resolve;
 
             const name = getNameFrom(buttonParams);
-            
+
             const button = new ClickableButton(
                 name,
                 { buttonText: buttonParams.text, font },
                 buttonParams.transform,
-                () => {}
+                () => { }
             );
 
             const onPress = () => {
