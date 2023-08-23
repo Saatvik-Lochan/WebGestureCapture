@@ -240,6 +240,28 @@ export function triChoiceButtons(text1: string, text2: string, text3: string): I
     return multiChoiceButtons([button1, button2, button3]);
 }
 
+export function dualChoiceButtons(text1: string, text2: string): InteractObject {
+    const leftbuttonTransform = new Matrix4();
+    leftbuttonTransform.makeTranslation(-0.3, 0.75, -0.45)
+    leftbuttonTransform.multiply(new Matrix4().makeRotationY(0.3));
+
+    const rightButtonTransform = new Matrix4();
+    rightButtonTransform.makeTranslation(0.3, 0.75, -0.45)
+    rightButtonTransform.multiply(new Matrix4().makeRotationY(-0.3));
+
+    const button1 = {
+        text: text1,
+        transform: leftbuttonTransform
+    }
+
+    const button2 = {
+        text: text2,
+        transform: rightButtonTransform
+    }
+
+    return multiChoiceButtons([button1, button2]);
+}
+
 export function createUndoButton(name: string, text = "REDO"): InteractObject {
     const transform = new Matrix4();
     transform.makeTranslation(0.45, 0.75, -0.4)

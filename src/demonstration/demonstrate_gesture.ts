@@ -20,7 +20,7 @@ class GhostHandModel extends Object3D {
      */
     motionController: XRHandMeshModel;
 
-    constructor(controller) {
+    constructor(controller: GhostHandSpace) {
 
         super();
 
@@ -157,7 +157,7 @@ export class GestureDemonstration {
  */
 function getNewHand(): GhostHandSpace {
     const hand = new Group() as GhostHandSpace;
-    hand.visible = true;
+    hand.visible = false;
     hand.matrixAutoUpdate = false;
 
     // @ts-ignore
