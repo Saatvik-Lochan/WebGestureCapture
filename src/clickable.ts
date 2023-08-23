@@ -75,6 +75,7 @@ export class ClickableButton {
 
     #hands: OculusHandModel[];
     #deleted = false;
+    #primed = true;
 
     constructor(
         name: string,
@@ -131,13 +132,20 @@ export class ClickableButton {
             const furthestY = Math.min(...allIntersectingFingers) - this.#buttonHeight / 2;
 
             if (furthestY <= this.#restingYValues.pressed) {
-                this.#onPress();
+                this.#button.position.y = this.#restingYValues.pressed;
+                
+                if (this.#primed) {
+                    this.#primed = false;
+                    this.#onPress();
+                }
+            } else if (furthestY >= this.#restingYValues.unpressed) {
+                this.#button.position.y = this.#restingYValues.unpressed;
+                this.#primed = true;
             } else {
-                this.#button.position.y = Math.min(furthestY, this.#restingYValues.unpressed);
+                this.#button.position.y = furthestY;
             }
         } else {
-            this.#button.position.y = this.#restingYValues.unpressed;
-        }
+            this.#button.position.y = this.#restingYValues.unpressed;        }
 
     }
 }

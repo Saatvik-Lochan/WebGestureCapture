@@ -4,8 +4,8 @@ import { initScene, animate, renderer, scene, updateBackendUrl } from "./init";
 import { performTrial } from "./trial_manager";
 import { test } from "./test";
 
-main();
-// test();
+// main();
+test();
 
 /**
  * The main function which is run when a participant is to perform 

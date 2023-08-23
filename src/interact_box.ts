@@ -1,12 +1,15 @@
-import * as THREE from "three";
 import { frameListeners, hands, scene } from "./init";
 import { TextGeometryParameters } from "three/examples/jsm/geometries/TextGeometry";
 import { Font } from "three/examples/jsm/loaders/FontLoader";
 import { getCenteredText } from "./text_display";
+import { ClickableButton } from "./clickable";
+import { Box3, BoxGeometry, EdgesGeometry, LineSegments, Matrix4, Mesh, MeshBasicMaterial, Sphere, Vector3 } from "three";
 
-const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.4, transparent: true });
-const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
-const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
+const greenMaterial = new MeshBasicMaterial({ color: 0x00ff00, opacity: 0.4, transparent: true });
+const redMaterial = new MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
+const blueMaterial = new MeshBasicMaterial({ color: 0x0000ff, opacity: 0.1, transparent: true });
+
+let height = 0.4;
 
 /**
  * A representation of an interactable object which has a single `activation`
@@ -58,7 +61,7 @@ type interactText = {
  * It resolves with `null` if the box is cancelled, by calling the `delete` 
  * function,
  */
-function createInteractBox(name: string, text: interactText = null): InteractObject{
+function createInteractBox(name: string, text: interactText): InteractObject{
     const textProperties: TextGeometryParameters = {
         font: text.font,
         size: 0.05,
@@ -71,16 +74,43 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
 
     let textMesh: THREE.Object3D<THREE.Event>;
 
-    const cubeGeom = new THREE.BoxGeometry(1, 0.4, 1);
-    const cube = new THREE.Mesh(cubeGeom, blueMaterial);
+    const cubeGeom = new BoxGeometry(1, 0.4, 1);
+    const cube = new Mesh(cubeGeom, blueMaterial);
 
-    // Also add a wireframe to the cube to better see the depth
-    const _wireframe = new THREE.EdgesGeometry(cubeGeom);
-    const wireframe = new THREE.LineSegments(_wireframe);
+    // add a wireframe to the cube to better see the depth
+    const _wireframe = new EdgesGeometry(cubeGeom);
+    const wireframe = new LineSegments(_wireframe);
 
-    // Rotate it a little for a better vantage point
-    cube.position.set(0, 0.4, -0.1);
-    wireframe.position.set(0, 0.4, -0.1);
+    let box = new Box3();
+
+    const setCubeHeight = (height: number) => {
+        cube.position.set(0, height, -0.1);
+        wireframe.position.set(0, height, -0.1);
+        box.setFromObject(cube);
+
+        updateText(text.enterText);
+    }
+
+    const clearText = () => {
+        if (textMesh) scene.remove(textMesh);
+    }
+
+    const updateText = (str: string) => {
+        clearText();
+        setText(str);
+
+        function setText(str: string) {
+            textMesh = getCenteredText(str, textProperties);
+            textMesh.position.add(new Vector3(0, box.max.y, box.min.z));
+
+            const offset = new Vector3(0, 0, -0.1);
+            textMesh.position.add(offset);
+            textMesh.rotateX(-0.75);
+            scene.add(textMesh);
+        }
+    }
+
+    setCubeHeight(height);
 
     // add to scene
     scene.add(cube)
@@ -88,13 +118,38 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
 
     let resolveFunc: (value: string) => void;
 
-    const clearText = () => {
-        if (textMesh) scene.remove(textMesh);
-    }
+    const incButtonTransform = new Matrix4();
+    incButtonTransform.makeTranslation(-0.4, 0.75, -0.35)
+    incButtonTransform.multiply(new Matrix4().makeRotationY(0.9));
+
+    const decButtonTransform = incButtonTransform.clone();
+    decButtonTransform.multiply(new Matrix4().makeTranslation(-0.3, 0, 0));
+
+    const incButton = new ClickableButton(
+        "increase height",
+        { font: text.font, buttonText: "up" },
+        incButtonTransform, 
+        () => {
+            height += 0.1;
+            setCubeHeight(height);
+        }
+    )
+
+    const decButton = new ClickableButton(
+        "decrease height",
+        { font: text.font, buttonText: "down" },
+        decButtonTransform, 
+        () => {
+            height -= 0.1;
+            setCubeHeight(height);
+        }
+    )
 
     const deleteBox = () => {
         scene.remove(cube);
         scene.remove(wireframe)
+        incButton.deleteButton();
+        decButton.deleteButton();
         clearText();
         delete frameListeners["button"];
     }
@@ -104,10 +159,6 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
         resolveFunc = resolve;
         
         // Create the cube itself
-
-        const box = new THREE.Box3();
-        box.setFromObject(cube);
-
         if (text) {
             updateText(text.enterText);
         }
@@ -163,22 +214,6 @@ function createInteractBox(name: string, text: interactText = null): InteractObj
             deleteBox();
             resolve(name);
         }
-
-
-        function updateText(str: string) {
-            clearText();
-            setText(str);
-
-            function setText(str: string) {
-                textMesh = getCenteredText(str, textProperties);
-                textMesh.position.add(new THREE.Vector3(0, box.max.y, box.min.z));
-
-                const offset = new THREE.Vector3(0, 0, -0.1);
-                textMesh.position.add(offset);
-                textMesh.rotateX(-0.75);
-                scene.add(textMesh);
-            }
-        }
     });
 
     return { 
@@ -208,8 +243,8 @@ function handsInBox(hands: THREE.XRHandSpace[], box: THREE.Box3): boolean {
         const radius = joint.jointRadius;
         const centre = joint.position;
 
-        const jointSphere = new THREE.Sphere(centre, radius);
-        const sphereBoundingBox = new THREE.Box3();
+        const jointSphere = new Sphere(centre, radius);
+        const sphereBoundingBox = new Box3();
         jointSphere.getBoundingBox(sphereBoundingBox);
 
         return box.containsBox(sphereBoundingBox);

@@ -1,7 +1,9 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { triChoiceButtons } from "./clickable";
+import { ClickableButton, triChoiceButtons } from "./clickable";
 import { animate, initScene, renderer, scene } from "./init";
-import { clearDisplayIndefinitely, displayStringIndefinitely, loadFont } from "./text_display";
+import { clearDisplayIndefinitely, displayStringIndefinitely, font, loadFont } from "./text_display";
+import { Event, Matrix4, Object3D } from "three";
+import { createInteractBox } from "./interact_box";
 
 export async function test() {
     await initScene();
@@ -16,19 +18,10 @@ function minimalSetup() {
 
 async function onStart() {
     await loadFont();
-
-    let displayString = displayStringIndefinitely("Start", scene);
-
-    for (;;) {
-        const buttonObj = triChoiceButtons("1", "2", "3");
-        
-        const result = await Promise.any([
-            buttonObj.completion,
-        ]);
-        
-        console.log(result)
-        clearDisplayIndefinitely(displayString, scene);
-        displayString = displayStringIndefinitely(result, scene)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+    
+    await createInteractBox("test", {
+        "enterText": "put your hands in the box",
+        "removeText": "remove your hands from the box",
+        font
+    }).completion
 }
