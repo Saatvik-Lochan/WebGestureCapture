@@ -57,12 +57,16 @@ export async function performTrial(
     // So the first gesture does not present a 'redo' option
     let askGestureIndex: number, offerRedo: boolean;
 
-    const startTrialLoop = () => {
+    const startTrialLoop = async () => {
+        await displayString("Starting trial", 1500, scene);
+
         offerRedo = false;
         askGestureIndex = 0;
     }
 
-    const redoPrevious = () => {
+    const redoPrevious = async () => {
+        await displayString("Undoing previous gesture", 1500, scene);
+        
         offerRedo = false;
         askGestureIndex--;
     }
@@ -72,7 +76,7 @@ export async function performTrial(
         askGestureIndex++;
     }
 
-    startTrialLoop();
+    await startTrialLoop();
 
     while (askGestureIndex <= trialToPerform.gestures.length) {
         // included here so we can redo the last gesture if requested
@@ -85,10 +89,10 @@ export async function performTrial(
 
             switch (result) {
                 case redoTrialText:
-                    startTrialLoop();
+                    await startTrialLoop();
                     continue;
                 case redoGestureText:
-                    redoPrevious();
+                    await redoPrevious();
                     continue;
                 default:
                 case saveText:
@@ -115,7 +119,7 @@ export async function performTrial(
 
             nextGesture();
         } else {
-            redoPrevious();
+            await redoPrevious();
         }
     }
 
@@ -191,6 +195,6 @@ async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) 
         startAndStreamHandDataToMain(durationMs, gestureLocator),
         countDown(durationS, fastTimeBoundary, 1, scene, 0)
             .then((_) => countDown(fastTimeBoundary, 0, 0.1, scene, 1)),
-        displayString(`recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
+        displayString(`Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
 }
