@@ -1,8 +1,6 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
-import { ClickableButton, triChoiceButtons } from "./clickable";
-import { animate, initScene, renderer, scene } from "./init";
-import { clearDisplayIndefinitely, displayStringIndefinitely, font, loadFont } from "./text_display";
-import { Event, Matrix4, Object3D } from "three";
+import { animate, initScene, renderer } from "./init";
+import { font, loadFont } from "./text_display";
 import { createInteractBox } from "./interact_box";
 
 export async function test() {
