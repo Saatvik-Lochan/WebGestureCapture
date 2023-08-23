@@ -99,15 +99,21 @@ async function displayTextSequence(textSequence: TextSequence, scene: Scene) {
 
 async function countDown(
     countFromS: number,
+    countToS: number,
     stepS: number,
     scene: Scene,
     decimals: number = 1,
     style: Style={size: 0.5, xpos: 0, ypos: 1} 
     ) {
 
-    const seq: TextSequence = [];
+    if (countToS >= countFromS) {
+        return;
+    }
 
-    for (let currentVal = countFromS; currentVal > stepS; currentVal -= stepS) {
+    const seq: TextSequence = [];
+    let currentVal: number;
+    
+    for (currentVal = countFromS; currentVal > stepS + countToS; currentVal -= stepS) {
         const inst: TextInstance = {
             textGroup: [{ text: currentVal.toFixed(decimals), style }], 
             durationMs: stepS * 1000
@@ -116,7 +122,8 @@ async function countDown(
         seq.push(inst);
     }
 
-    seq.push( {textGroup: [{ text: stepS.toFixed(decimals), style }], durationMs: stepS * 1000} );
+    // we know currentVal > countToS
+    seq.push( {textGroup: [{ text: (stepS + countToS).toFixed(decimals), style }], durationMs: ( currentVal - countToS ) * 1000 } );
  
     await displayTextSequence(seq, scene);
 }
