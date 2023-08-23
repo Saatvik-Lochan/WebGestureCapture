@@ -122,8 +122,10 @@ async function countDown(
         seq.push(inst);
     }
 
-    // we know currentVal > countToS
-    seq.push( {textGroup: [{ text: (stepS + countToS).toFixed(decimals), style }], durationMs: ( currentVal - countToS ) * 1000 } );
+    seq.push({ 
+        textGroup: [{ text: (stepS + countToS).toFixed(decimals), style }], 
+        durationMs: ( currentVal - countToS ) * 1000 // we know currentVal > countToS
+    });
  
     await displayTextSequence(seq, scene);
 }
