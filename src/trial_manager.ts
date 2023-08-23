@@ -183,9 +183,11 @@ async function displayGestureInstructions(
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
     const durationMs = gesture.duration * 1000;
     const durationS = durationMs / 1000;
+    const fasterClockStartTimeS = 3;
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
-        countDown(Math.max(0, durationS), 1, scene, 0).then((_) => countDown(Math.min(1, durationS), 0.1, scene, 1)),
+        countDown(Math.max(0, durationS - fasterClockStartTimeS), 1, scene, 0)
+            .then((_) => countDown(Math.min(fasterClockStartTimeS, durationS), 0.1, scene, 1)),
         displayString(`recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
 }
