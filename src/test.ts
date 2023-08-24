@@ -2,6 +2,7 @@ import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { animate, initScene, renderer } from "./init";
 import { font, loadFont } from "./text_display";
 import { createInteractBox } from "./interact_box";
+import { createProgressBar } from "./progress_bar";
 
 export async function test() {
     await initScene();
@@ -17,9 +18,5 @@ function minimalSetup() {
 async function onStart() {
     await loadFont();
     
-    await createInteractBox("test", {
-        "enterText": "put your hands in the box",
-        "removeText": "remove your hands from the box",
-        font
-    }).completion
+    await createProgressBar("progress", 10).completion;
 }

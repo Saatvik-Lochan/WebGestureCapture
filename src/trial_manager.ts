@@ -5,6 +5,7 @@ import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
 import { createUndoButton, triChoiceButtons } from "./clickable";
 import { renderer, scene } from "./init";
+import { createProgressBar } from "./progress_bar";
 
 export function displaySkipableInstruction(
     instruction: string,
@@ -190,14 +191,10 @@ async function displayGestureInstructions(
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
     const durationS = gesture.duration;
     const durationMs = durationS * 1000;
-    const fasterClockStartTimeS = 3;
-
-    const fastTimeBoundary = Math.min(fasterClockStartTimeS, durationS);
 
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
-        countDown(durationS, fastTimeBoundary, 1, scene, 0)
-            .then((_) => countDown(fastTimeBoundary, 0, 0.1, scene, 1)),
+        createProgressBar("progess", durationS).completion,
         displayString(`Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
 }

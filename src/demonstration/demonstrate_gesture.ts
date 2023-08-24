@@ -79,17 +79,17 @@ export class GestureDemonstration {
     /**
      * A translation applied to the demonstration to place them in the world
      */
-    #translation = new Matrix4().makeTranslation(0, 0, -1);
+    translation = new Matrix4().makeTranslation(0, 0, -1);
 
     /**
      * The hands displaying the demonstration
      */
-    #hands: { leftHand: GhostHandSpace, rightHand: GhostHandSpace };
+    hands: { leftHand: GhostHandSpace, rightHand: GhostHandSpace };
 
     constructor(name: string) {
         this.#name = name;
-        this.#hands = addBothGhostHands();
-        Object.values(this.#hands).forEach(hand => hand.applyMatrix4(this.#translation));
+        this.hands = addBothGhostHands();
+        Object.values(this.hands).forEach(hand => hand.applyMatrix4(this.translation));
     }
 
     /**
@@ -111,7 +111,7 @@ export class GestureDemonstration {
      * Start the playback of the demonstration
      */
     startPlaybackLoop() {
-        Object.values(this.#hands).forEach(hand => hand.visible = true);
+        Object.values(this.hands).forEach(hand => hand.visible = true);
         frameListeners[this.#name] = {
             fcn: () => this._nextFrame(),
             t: 1,
@@ -122,7 +122,7 @@ export class GestureDemonstration {
      * Stop the playback of the demonstration
      */
     stopPlayback() {
-        Object.values(this.#hands).forEach(hand => hand.visible = false);
+        Object.values(this.hands).forEach(hand => hand.visible = false);
         delete frameListeners[this.#name];
     }
 
@@ -145,7 +145,7 @@ export class GestureDemonstration {
         if (frame < 0 || this.#frames <= frame) return;
 
         this.#currentFrame = frame;
-        setHandsToFrame(this.#currentFrame, this.#data, this.#hands.leftHand, this.#hands.rightHand);
+        setHandsToFrame(this.#currentFrame, this.#data, this.hands.leftHand, this.hands.rightHand);
     }
 }
 

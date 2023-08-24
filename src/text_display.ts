@@ -97,6 +97,16 @@ async function displayTextSequence(textSequence: TextSequence, scene: Scene) {
     clearTextGroup(currentTextGroup, scene);
 }
 
+export async function countDownWithSpeed(
+    countFromS: number,
+    speedupTime: number,
+    scene: Scene,
+    style: Style={size: 0.5, xpos: 0, ypos: 1}  
+) {
+    return countDown(countFromS, speedupTime, 1, scene, 0)
+            .then((_) => countDown(speedupTime, 0, 0.1, scene, 1))
+}
+
 async function countDown(
     countFromS: number,
     countToS: number,

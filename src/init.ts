@@ -126,7 +126,9 @@ async function initScene() {
     async function initCameraAndScene() {
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50);
         scene = new THREE.Scene();
-        scene.add(new THREE.HemisphereLight(0xbcbcbc, 0xa5a5a5, 3));
+
+        // scene.add(new THREE.AmbientLight())
+        scene.add(new THREE.HemisphereLight(0xbcbcbc, 0xa5a5a5, 2.5));
     }
 
     async function initAudio() {
@@ -190,6 +192,6 @@ function animate() {
     });
 }
 
-export { frameListeners, audio, hands };
+export { frameListeners, audio, hands, camera };
 export { initScene } 
 export { animate, renderer, scene };
