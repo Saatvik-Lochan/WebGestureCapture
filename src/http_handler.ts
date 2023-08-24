@@ -142,10 +142,11 @@ export async function getNextTrial(project_name: string, participant_id: string)
  * 
  * @remarks route: /trial/complete-trial/{project_name}/{participant_id}/{trial_id}
  */
-export async function completeTrial(trial_id: string, project_name: string, participant_id: string) {
+export async function completeTrial(trial_id: string, project_name: string, participant_id: string, redos: number[]) {
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
         method: 'POST',
+        body: `${project_name}, ${participant_id}, ${trial_id}, ${ redos.join(", ") }`
     });
 }
 

@@ -56,9 +56,11 @@ export async function performTrial(
 
     // So the first gesture does not present a 'redo' option
     let askGestureIndex: number, offerRedo: boolean;
+    let gestureRedos;
 
     const startTrialLoop = async () => {
         await displayString("Starting trial", 1500, scene);
+        gestureRedos = Array(10).fill(0);
 
         offerRedo = false;
         askGestureIndex = 0;
@@ -69,6 +71,7 @@ export async function performTrial(
         
         offerRedo = false;
         askGestureIndex--;
+        gestureRedos[askGestureIndex]++;
     }
 
     const nextGesture = () => {
@@ -96,7 +99,7 @@ export async function performTrial(
                     continue;
                 default:
                 case saveText:
-                    await completeTrial(trialToPerform.trial_id, project_name, participant_id);
+                    await completeTrial(trialToPerform.trial_id, project_name, participant_id, gestureRedos);
                     await renderer.xr.getSession().end();
                     return;
             }
