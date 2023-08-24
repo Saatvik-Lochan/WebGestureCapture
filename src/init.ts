@@ -128,6 +128,7 @@ async function initScene() {
         scene = new THREE.Scene();
 
         // scene.add(new THREE.AmbientLight())
+        scene.add(new THREE.DirectionalLight());
         scene.add(new THREE.HemisphereLight(0xbcbcbc, 0xa5a5a5, 2.5));
     }
 

@@ -1,9 +1,8 @@
 import { Vector3, XRHandSpace } from "three";
 import { getDemonstration } from "../../http_handler";
 import { animate, camera, initScene, renderer, updateBackendUrl } from "../../init";
-import { createProgressBar } from "../../progress_bar";
 import { GestureDemonstration } from "../demonstrate_gesture";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 main();
 
