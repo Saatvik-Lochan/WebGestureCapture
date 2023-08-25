@@ -52,6 +52,7 @@ server {
 
     location / {}
     location /demonstration/ {}
+    location /demonstration/view/ {}
 }
 ```
 
