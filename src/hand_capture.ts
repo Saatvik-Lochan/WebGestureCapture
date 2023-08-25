@@ -150,7 +150,6 @@ function getHandDataAsArray(clock: Clock): handFrame {
  * by {@link getHandDataAsArray}.
  */
 export async function captureHandSequence(durationMs: number): Promise<handFrame[]> {
-	// setting as 0 for now
 	const clock = new Clock(true);
 	const capturedData: handFrame[] = [];
 
