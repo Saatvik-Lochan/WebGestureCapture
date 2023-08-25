@@ -57,11 +57,11 @@ export async function performTrial(
 
     // So the first gesture does not present a 'redo' option
     let askGestureIndex: number, offerRedo: boolean;
-    let gestureRedos;
+    let gestureRedos: number[];
 
     const startTrialLoop = async () => {
         await displayString("Starting trial", 1500, scene);
-        gestureRedos = Array(10).fill(0);
+        gestureRedos = Array(trialToPerform.gestures.length).fill(0);
 
         offerRedo = false;
         askGestureIndex = 0;

@@ -143,9 +143,13 @@ export async function getNextTrial(project_name: string, participant_id: string)
  * @remarks route: /trial/complete-trial/{project_name}/{participant_id}/{trial_id}
  */
 export async function completeTrial(trial_id: string, project_name: string, participant_id: string, redos: number[]) {
+    console.log('%chttp_handler.ts line:146 redos', 'color: #007acc;', redos);
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
         method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
         body: JSON.stringify(redos)
     });
 }
