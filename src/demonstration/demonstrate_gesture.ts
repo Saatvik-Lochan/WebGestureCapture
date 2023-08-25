@@ -193,8 +193,8 @@ function getNewHand(): GhostHandSpace {
  * @param rightHand A {@link GhostHandSpace} for the right hand
  */
 function setHandsToFrame(frame: number, data: handSequence, leftHand: GhostHandSpace, rightHand: GhostHandSpace) {
-    populateHandFromIndex(leftHand, data, frame * 352);
-    populateHandFromIndex(rightHand, data, frame * 352 + 175);
+    populateHandFromIndex(leftHand, data, frame * 359);
+    populateHandFromIndex(rightHand, data, frame * 359 + 175);
 }
 
 /**
@@ -203,7 +203,7 @@ function setHandsToFrame(frame: number, data: handSequence, leftHand: GhostHandS
  * @returns A number which describes the number of frames in the specified {@link handSequence}
  */
 function getFrames(data: handSequence) {
-    return Math.floor(data.length / 352);
+    return Math.floor(data.length / 361);
 }
 
 /**

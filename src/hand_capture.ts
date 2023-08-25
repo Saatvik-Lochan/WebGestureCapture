@@ -1,10 +1,11 @@
-import { Clock, XRHandSpace, WebGLRenderer } from "three";
-import { frameListener, frameListeners, hands } from "./init";
+import { Clock, XRHandSpace, WebGLRenderer, Vector3, Quaternion, Object3D } from "three";
+import { camera, frameListener, frameListeners, hands } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 /**
- * An array of handData of length `352`. It is composed of `2` hands each of length 
+ * An array of handData of length `359`. It is composed of `2` hands each of length 
  * `175` - left hand first. Along with `2` values for the `startTime` and the `endTime`. 
+ * And 7 values for the camera pose at the time.
  * 
  * Each hand is composed of `25` joints in the order 
  * of {@link indexToJointName}. Each joint is composed of `7` data values. 
@@ -96,11 +97,9 @@ function getHandDataAsArray(clock: Clock): handFrame {
 
 
 	function getJointAsArr(handObj: XRHandSpace, jointName: string): number[] {
-		const poseArray =
-			[...handObj.joints[jointName].position.toArray(),
-			...handObj.joints[jointName].quaternion.toArray()];
+		const joint = handObj.joints[jointName];
 
-		return poseArray;
+		return getWorldPoseFromObject(joint);
 	}
 
 	function getHandAsArray(handObj: XRHandSpace): number[] {
@@ -113,8 +112,24 @@ function getHandDataAsArray(clock: Clock): handFrame {
 		return out_arr
 	}
 
+	function getCameraPoseAsArray(): number[] {
+		return getWorldPoseFromObject(camera);
+	}
+	
+	function getWorldPoseFromObject(obj: Object3D): number[] {
+		const worldPos = new Vector3();
+		obj.getWorldPosition(worldPos);
+
+		const worldQuat = new Quaternion();
+		obj.getWorldQuaternion(worldQuat)
+
+		return [...worldPos.toArray(), ...worldQuat.toArray()];
+	}
+
 	const captureStartTime = clock.getElapsedTime();
-	const capturedData =  getHandAsArray(leftHand).concat(getHandAsArray(rightHand));
+	const capturedData =  getHandAsArray(leftHand)
+							.concat(getHandAsArray(rightHand))
+							.concat(getCameraPoseAsArray());
 	const captureEndTime = clock.getElapsedTime();
 
 	capturedData.push(captureStartTime, captureEndTime);
