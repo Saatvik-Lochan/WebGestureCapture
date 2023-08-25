@@ -1,5 +1,5 @@
 import { Clock, XRHandSpace, WebGLRenderer, Vector3, Quaternion, Object3D } from "three";
-import { camera, frameListener, frameListeners, hands } from "./init";
+import { camera, frameListener, frameListeners, hands, renderer } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 /**
@@ -113,7 +113,7 @@ function getHandDataAsArray(clock: Clock): handFrame {
 	}
 
 	function getCameraPoseAsArray(): number[] {
-		return getWorldPoseFromObject(camera);
+		return getWorldPoseFromObject(renderer.xr.getCamera());
 	}
 	
 	function getWorldPoseFromObject(obj: Object3D): number[] {
