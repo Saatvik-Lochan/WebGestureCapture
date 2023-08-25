@@ -146,7 +146,7 @@ export async function completeTrial(trial_id: string, project_name: string, part
     return await fetch(
         `${backend_url}/trial/complete-trial/${project_name}/${participant_id}/${trial_id}`, {
         method: 'POST',
-        body: `${project_name}, ${participant_id}, ${trial_id}, ${ redos.join(", ") }`
+        body: JSON.stringify(redos)
     });
 }
 
