@@ -189,8 +189,7 @@ export async function sendDemonstrationBatch(data: handArrayBuffer, shortcode: s
         `${backend_url}/demonstration/append-data/${shortcode}`, {
         method: 'POST',
         body: formData
-    }
-    );
+    });
 
     if (response.status == 201)
         console.log(`sent ${data.byteLength} bytes of gesture data successfully`);
