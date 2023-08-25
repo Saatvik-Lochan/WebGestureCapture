@@ -58,7 +58,8 @@ server {
 
 See [HTTPS](#https) for `<ssl certificate>` and `<ssl key>`
 
-You could also use a hosting provider - just ensure that both the `/` and the `/demonstration/` route have been enabled.
+You could also use a hosting provider - just ensure that the `/`, `/demonstration/`,  
+and `/demonstration/view/` route have been enabled.
 
 ### HTTPS
 HTTPS is required to run [WebXR](https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API) 
