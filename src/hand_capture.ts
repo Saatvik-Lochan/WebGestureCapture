@@ -1,4 +1,4 @@
-import { Clock, XRHandSpace, WebGLRenderer, Vector3, Quaternion, Object3D } from "three";
+import { Clock, XRHandSpace, WebGLRenderer, Vector3, Quaternion, Object3D, Matrix4 } from "three";
 import { camera, frameListener, frameListeners, hands, renderer } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
@@ -117,11 +117,13 @@ function getHandDataAsArray(clock: Clock): handFrame {
 	}
 	
 	function getWorldPoseFromObject(obj: Object3D): number[] {
-		const worldPos = new Vector3();
-		obj.getWorldPosition(worldPos);
+		const localToWorldMat = obj.matrixWorld.clone().invert();
 
+		const worldPos = new Vector3();
 		const worldQuat = new Quaternion();
-		obj.getWorldQuaternion(worldQuat)
+		const worldScale = new Vector3();
+		
+		localToWorldMat.decompose( worldPos, worldQuat, worldScale );
 
 		return [...worldPos.toArray(), ...worldQuat.toArray()];
 	}
