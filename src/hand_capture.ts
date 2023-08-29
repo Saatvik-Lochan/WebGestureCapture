@@ -117,13 +117,11 @@ function getHandDataAsArray(clock: Clock): handFrame {
 	}
 	
 	function getWorldPoseFromObject(obj: Object3D): number[] {
-		const localToWorldMat = obj.matrixWorld.clone().invert();
-
 		const worldPos = new Vector3();
 		const worldQuat = new Quaternion();
 		const worldScale = new Vector3();
 		
-		localToWorldMat.decompose( worldPos, worldQuat, worldScale );
+		obj.matrixWorld.decompose( worldPos, worldQuat, worldScale );
 
 		return [...worldPos.toArray(), ...worldQuat.toArray()];
 	}
