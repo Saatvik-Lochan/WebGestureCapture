@@ -19,20 +19,20 @@ https://vitejs.dev/guide/build.html for building and deployment options.
 
 First you must clone the repository
 ```console
-$ git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
+git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
 ```
 
 
 For most it will be enough to run
 
 ```console
-$ npm install
+npm install
 ```
 
 and then build the project with 
 
 ```console
-$ npx vite build
+npx vite build
 ```
 
 ### Hosting
