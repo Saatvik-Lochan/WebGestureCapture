@@ -42,7 +42,7 @@ If you are using a VPS with Nginx, you can use a server block such as this:
 ```nginx
 server {
     listen 443 ssl;
-    server_name <your server_name>;
+    server_name <server_name>;
     ssl_certificate <ssl certificate>;
     ssl_certificate_key <ssl key>;
 
@@ -57,7 +57,8 @@ server {
 }
 ```
 
-See [HTTPS](#https) for `<ssl certificate>` and `<ssl key>`
+See [HTTPS](#https) for `<ssl certificate>` and `<ssl key>`. See [this](http://nginx.org/en/docs/http/server_names.html)
+page for `<server_name>`.
 
 You could also use a hosting provider - just ensure that the `/`, `/demonstration/`,  
 and `/demonstration/view/` route have been enabled.
