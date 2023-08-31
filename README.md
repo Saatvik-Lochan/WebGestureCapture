@@ -19,20 +19,21 @@ https://vitejs.dev/guide/build.html for building and deployment options.
 
 First you must clone the repository
 ```console
-$ git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
+git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
+cd WebGestureCapture
 ```
 
 
 For most it will be enough to run
 
 ```console
-$ npm install
+npm install
 ```
 
 and then build the project with 
 
 ```console
-$ npx vite build
+npx vite build
 ```
 
 ### Hosting
@@ -41,12 +42,12 @@ If you are using a VPS with Nginx, you can use a server block such as this:
 ```nginx
 server {
     listen 443 ssl;
-    server_name <your server_name>;
+    server_name <server_name>;
     ssl_certificate <ssl certificate>;
     ssl_certificate_key <ssl key>;
 
     # example: /var/www/WebGestureCapture/dist
-    root <your repo location>/dist;  
+    root <path to repo>/WebGestureCapture/dist;  
 
     index index.html;
 
@@ -56,7 +57,8 @@ server {
 }
 ```
 
-See [HTTPS](#https) for `<ssl certificate>` and `<ssl key>`
+See [HTTPS](#https) for `<ssl certificate>` and `<ssl key>`. See [this](http://nginx.org/en/docs/http/server_names.html)
+page for `<server_name>`.
 
 You could also use a hosting provider - just ensure that the `/`, `/demonstration/`,  
 and `/demonstration/view/` route have been enabled.
