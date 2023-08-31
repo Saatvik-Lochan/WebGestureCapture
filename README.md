@@ -20,6 +20,7 @@ https://vitejs.dev/guide/build.html for building and deployment options.
 First you must clone the repository
 ```console
 git clone https://github.com/Saatvik-Lochan/WebGestureCapture.git
+cd WebGestureCapture
 ```
 
 
