@@ -53,7 +53,8 @@ export function createProgressBar(name: string, timeS: number): InteractObject {
                     resolve(name);
                 }
             },
-            t: 1
+            t: 2,
+            offset: 1
        }
     });
 

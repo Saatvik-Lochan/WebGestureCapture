@@ -195,7 +195,7 @@ function createInteractBox(name: string, text: interactText): InteractObject{
                     }
                 }
             },
-            t: 2
+            t: 3
         }
 
         function onHandsFirstEnter() {
