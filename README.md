@@ -47,7 +47,7 @@ server {
     ssl_certificate_key <ssl key>;
 
     # example: /var/www/WebGestureCapture/dist
-    root <your repo location>/dist;  
+    root <path to repo>/WebGestureCapture/dist;  
 
     index index.html;
 
