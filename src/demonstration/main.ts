@@ -1,6 +1,6 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { GestureClassLocator, getDemonstration, shortCodeExists, startDemonstrationTransfer } from "../http_handler";
-import { initScene, animate, renderer, scene, updateBackendUrl } from "../init";
+import { initScene, animate, renderer, scene, initHands, updateBackendUrl } from "../init";
 import { displaySkipableInstruction } from "../trial_manager";
 import { streamHandDataDemonstration } from "../hand_capture";
 import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, loadFont } from "../text_display";
@@ -43,7 +43,7 @@ async function initDemonstration(): Promise<any> {
     document.body.appendChild(VRButton.createButton(renderer));
 
     const demonstration = new GestureDemonstration("preview");
-    renderer.xr.addEventListener('sessionstart', async () => await startDemonstrationRecording(shortCode, demonstration, name, durationMs, locator));
+    renderer.xr.addEventListener('sessionstart', async () => { await initHands(), startDemonstrationRecording(shortCode, demonstration, name, durationMs, locator) });
     renderer.xr.addEventListener('sessionend', () => location.reload());
 }
 

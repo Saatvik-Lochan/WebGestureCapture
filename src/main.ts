@@ -1,6 +1,6 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { getNextTrial } from "./http_handler";
-import { initScene, animate, renderer, scene, updateBackendUrl } from "./init";
+import { initScene, animate, renderer, scene, initHands, updateBackendUrl } from "./init";
 import { performTrial } from "./trial_manager";
 import { test } from "./test";
 
@@ -41,8 +41,9 @@ async function initProject() {
                     const trial = await response.json();
                     message = "You have pending trials. Click 'Enter VR' to start"
 
-                    renderer.xr.addEventListener('sessionstart', () => {
-                        performTrial(trial, project, participant)
+                    renderer.xr.addEventListener('sessionstart', async () => { 
+                        await initHands();
+                        performTrial(trial, project, participant);
                     });
                     renderer.xr.addEventListener('sessionend', () => {
                         location.reload();

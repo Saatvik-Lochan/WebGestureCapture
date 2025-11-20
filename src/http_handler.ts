@@ -4,6 +4,7 @@ import { handArrayBuffer, handSequence } from "./hand_capture";
  * The url of to the backend {@link https://github.com/Saatvik-Lochan/WebGestureCaptureBackend | server}. Must be set with {@link setBackendUrl}.
  */
 export let backend_url = "https://gesturelogger.com:8000";
+// export let backend_url = "https://localhost:8000";
 
 /**
  * A helper function to set the url that the server communicates with

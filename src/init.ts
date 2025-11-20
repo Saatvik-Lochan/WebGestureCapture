@@ -111,9 +111,6 @@ async function initScene() {
         initCameraAndScene(),
         initAudio(),
     ]);
-    
-    // will only resolve once xr has been opened and hands are connected
-    initHands()
 
     async function initRenderer() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -137,29 +134,29 @@ async function initScene() {
         camera.add(listener);
         audio = new THREE.Audio(listener);
     }
+}
 
-    async function initHands() {
-        const handModelFactory = new XRHandModelFactory();
+async function initHands() {
+    const handModelFactory = new XRHandModelFactory();
 
-        async function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
-            const outHand = renderer.xr.getHand(index);
+    async function initHand(index: number, type: "spheres" | "boxes" | "mesh") {
+        const outHand = renderer.xr.getHand(index);
 
-            scene.add(outHand);
+        scene.add(outHand);
 
-            const handModel = handModelFactory.createHandModel(outHand, type);
-            outHand.add(handModel);
+        const handModel = handModelFactory.createHandModel(outHand, type);
+        outHand.add(handModel);
 
-            const handedness: XRHandedness = 
-                await new Promise(resolve => outHand.addEventListener('connected', event => {
-                    const xrInputSource = event.data;
-                    resolve(xrInputSource.handedness);
-            }));
+        const handedness: XRHandedness = 
+            await new Promise(resolve => outHand.addEventListener('connected', event => {
+                const xrInputSource = event.data;
+                resolve(xrInputSource.handedness);
+        }));
 
-            return [handedness, outHand];
-        }
-
-        hands = Object.fromEntries(await Promise.all([0, 1].map(ele => initHand(ele, "mesh"))));
+        return [handedness, outHand];
     }
+
+    hands = Object.fromEntries(await Promise.all([0, 1].map(ele => initHand(ele, "mesh"))));
 }
 
 /**
@@ -194,5 +191,6 @@ function animate() {
 }
 
 export { frameListeners, audio, hands, camera };
-export { initScene } 
+export { initScene };
+export { initHands };
 export { animate, renderer, scene };
