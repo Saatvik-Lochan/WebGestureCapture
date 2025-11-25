@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, Object3D, Scene, Vector3 } from 'three';
-import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry, TextGeometryParameters } from 'three/examples/jsm/geometries/TextGeometry.js';
+import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { TextGeometry, TextGeometryParameters } from 'three/examples/jsm/geometries/TextGeometry';
 
 // object type definitions
 let font: Font;

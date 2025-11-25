@@ -1,5 +1,5 @@
 import { BoxGeometry, Matrix4, Mesh, MeshBasicMaterial, Object3D, Vector3 } from "three";
-import { OculusHandModel } from 'three/examples/jsm/webxr/OculusHandModel.js';
+import { OculusHandModel } from 'three/examples/jsm/webxr/OculusHandModel';
 import { frameListeners, hands, scene } from "./init";
 import { font, getCenteredText } from "./text_display";
 import { Font } from "three/examples/jsm/loaders/FontLoader";
