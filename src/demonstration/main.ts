@@ -24,12 +24,12 @@ async function initDemonstration(): Promise<any> {
     const urlParams = new URLSearchParams(window.location.search);
     const name = decodeURIComponent(urlParams.get('name'));
     const shortCode = urlParams.get('code');
-    const durationMs = parseFloat(urlParams.get('durationMs'));
+    const durationMs = parseFloat(urlParams.get('durationMs')) * 1.03;
 
     await loadFont();
 
-    if (!shortCode || !durationMs || durationMs < 0 || 30030 < durationMs) {
-        setMainText("Both code and durationMs (between 0 and 30030) must be provided")
+    if (!shortCode || !durationMs || durationMs < 0 || 30900 < durationMs) {
+        setMainText("Both code and durationMs (between 0 and 30900) must be provided")
         return;
     }
 

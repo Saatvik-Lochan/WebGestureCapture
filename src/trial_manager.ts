@@ -190,7 +190,7 @@ async function displayGestureInstructions(
 
 async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
     const durationS = gesture.duration;
-    const durationMs = durationS * 1000;
+    const durationMs = durationS * 1000 * 1.03;
 
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
