@@ -77,6 +77,16 @@ export class GestureDemonstration {
     #currentFrame: number
 
     /**
+     * Timestamp when playback started
+     */
+    #playbackStartTime: number | null = null;
+    
+    /**
+     * Timestamp of the first frame in the recording
+     */
+    #recordingStartTime: number | null = null;
+
+    /**
      * A translation applied to the demonstration to place them in the world
      */
     translation = new Matrix4().makeTranslation(0, 0, -1);
@@ -112,8 +122,14 @@ export class GestureDemonstration {
      */
     startPlaybackLoop() {
         Object.values(this.hands).forEach(hand => hand.visible = true);
+        
+        // Initialize timing
+        this.#playbackStartTime = performance.now() / 1000; // Convert to seconds
+        this.#recordingStartTime = this.#getFrameStartTime(0);
+        this.#currentFrame = 0;
+        
         frameListeners[this.#name] = {
-            fcn: () => this._nextFrame(),
+            fcn: () => this._playWithTiming(),
             t: 1,
         }
     }
@@ -124,6 +140,57 @@ export class GestureDemonstration {
     stopPlayback() {
         Object.values(this.hands).forEach(hand => hand.visible = false);
         delete frameListeners[this.#name];
+        this.#playbackStartTime = null;
+        this.#recordingStartTime = null;
+    }
+
+    /**
+     * Play the demonstration respecting the original timing
+     */
+    _playWithTiming() {
+        if (this.#playbackStartTime === null || this.#recordingStartTime === null) return;
+        
+        // Calculate how much time has elapsed since playback started
+        const currentTime = performance.now() / 1000; // seconds
+        const elapsedPlaybackTime = currentTime - this.#playbackStartTime;
+        
+        // Find the frame that corresponds to this elapsed time
+        let targetFrame = this.#currentFrame;
+        
+        // Search forward to find the right frame
+        while (targetFrame < this.#frames - 1) {
+            const frameTime = this.#getFrameStartTime(targetFrame) - this.#recordingStartTime;
+            
+            if (frameTime > elapsedPlaybackTime) {
+                break;
+            }
+            
+            targetFrame++;
+        }
+        
+        // Update to the target frame
+        if (targetFrame !== this.#currentFrame) {
+            this._updateToFrame(targetFrame);
+        }
+        
+        // Loop back to start if we've reached the end
+        if (targetFrame >= this.#frames - 1) {
+            const lastFrameTime = this.#getFrameStartTime(this.#frames - 1) - this.#recordingStartTime;
+            
+            if (elapsedPlaybackTime > lastFrameTime + 0.1) { // Small buffer
+                this.#playbackStartTime = performance.now() / 1000;
+                this.#currentFrame = 0;
+                this._updateToFrame(0);
+            }
+        }
+    }
+
+    /**
+     * Get the start time (in seconds) for a specific frame
+     */
+    #getFrameStartTime(frameIndex: number): number {
+        // startTime is at position 357 of each 359-value frame
+        return this.#data[frameIndex * 359 + 357];
     }
 
     /**
