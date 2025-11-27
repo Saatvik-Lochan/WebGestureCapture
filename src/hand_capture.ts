@@ -236,7 +236,7 @@ export function capturedToBuffer(captureData: handFrame[]): handArrayBuffer {
  * less than `timePeriod`. See {@link frameListener}.
  */
 async function streamHandData(durationMs: number,
-	sendFcn: (data: handFrame[]) => any, blockSize: number = 1000, 
+	sendFcn: (data: handFrame[]) => any, blockSize: number = 100, 
 	name: string = "captureHands",
 	timePeriod: number = 1,
 	offset: number = 0) {
@@ -244,13 +244,16 @@ async function streamHandData(durationMs: number,
 	console.log("stream hand data called");
 	const clock = new Clock(true);
 	let capturedData: number[][] = [];
+	let isRecording = true;
 
 	frameListeners[name] = {
-		fcn: () => {
+		fcn: async () => {  
+			if (!isRecording) return;
+			
 			capturedData.push(getHandDataAsArray(clock));
 
 			if (capturedData.length >= blockSize) {
-				sendCaptured();
+				await sendCaptured();  
 			}
 		},
 		t: timePeriod,
@@ -258,11 +261,18 @@ async function streamHandData(durationMs: number,
 	}
 
 	await new Promise(resolve => setTimeout(resolve, durationMs));
+	
+	isRecording = false;
 	delete frameListeners[name];
+	
 	await sendCaptured();
 
 	async function sendCaptured() {
-		await sendFcn(capturedData);
+		if (capturedData.length === 0) return; 
+		
+		const dataToSend = capturedData;
 		capturedData = [];
+		
+		await sendFcn(dataToSend);
 	}
 }
