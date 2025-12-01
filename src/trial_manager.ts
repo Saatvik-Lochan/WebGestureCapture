@@ -1,5 +1,5 @@
 import { startAndStreamHandDataToMain } from "./hand_capture";
-import { clearDisplayIndefinitely, countDown, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
+import { clearDisplayIndefinitely, displayString, displayStringIndefinitely, font, loadFont } from "./text_display";
 import { completeTrial, getDemonstration } from "./http_handler";
 import { InteractObject, createInteractBox } from "./interact_box";
 import { GestureDemonstration } from "./demonstration/demonstrate_gesture";
@@ -116,7 +116,8 @@ export async function performTrial(
             await performGesture(
                 gestureToPerform,
                 getGestureLocator(askGestureIndex),
-                demonstration
+                demonstration,
+                trialToPerform.instructions
             );
 
             nextGesture();
@@ -196,18 +197,26 @@ async function displayGestureInstructions(
 async function performGesture(
     gesture: Gesture, 
     gestureLocator: GestureLocator,
-    demonstration: GestureDemonstration) {
+    demonstration: GestureDemonstration,
+    trialInstructions: string) {
     
     const durationS = gesture.duration;
     const durationMs = durationS * 1000 * 1.03;
 
-    demonstration.startPlaybackLoop();
+    // Add a flag for showing demonstration playback
+    const showDemo = true;
+
+    if (showDemo) {
+        demonstration.startPlaybackLoop();
+    }
 
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
         createProgressBar("progress", durationS).completion,
-        displayString(`Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
+        displayString(`${trialInstructions}\n Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
     
-    demonstration.stopPlayback();
+    if (showDemo) {
+        demonstration.stopPlayback();
+    }
 }
