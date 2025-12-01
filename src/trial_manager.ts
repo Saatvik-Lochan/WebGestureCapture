@@ -23,7 +23,6 @@ export function displaySkipableInstruction(
         }
     );
 
-
     return {
         completion: awaitTrigger(),
         delete: () => {
@@ -33,12 +32,10 @@ export function displaySkipableInstruction(
     }
 
     async function awaitTrigger() {
-
         const completedVal = await interactBox.completion;
         clearDisplayIndefinitely(textObj, scene);
         return completedVal;
     }
-
 }
 
 export async function performTrial(
@@ -118,7 +115,8 @@ export async function performTrial(
         if (record) {
             await performGesture(
                 gestureToPerform,
-                getGestureLocator(askGestureIndex)
+                getGestureLocator(askGestureIndex),
+                demonstration
             );
 
             nextGesture();
@@ -137,14 +135,20 @@ export async function performTrial(
     }
 }
 
-async function startDemonstrationIfExists(project_name: string, gesture_id: string, demonstration: GestureDemonstration) {
+async function startDemonstrationIfExists(
+    project_name: string, 
+    gesture_id: string, 
+    demonstration: GestureDemonstration): Promise<boolean> {
+    
     const demonstrationData = await getDemonstration(project_name, gesture_id);
 
     if (demonstrationData) {
-        demonstration.load(demonstrationData)
+        demonstration.load(demonstrationData);
         demonstration.startPlaybackLoop();
         console.log("demonstration started");
+        return true;
     }
+    return false;
 }
 
 async function displayGestureInstructions(
@@ -152,7 +156,8 @@ async function displayGestureInstructions(
     gestureLocator: GestureLocator,
     demonstration: GestureDemonstration,
     offerRedo = false) {
-    startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
+    
+    await startDemonstrationIfExists(gestureLocator.project_name, gesture.gesture_id, demonstration);
 
     const instructions = displaySkipableInstruction(
         gesture.instruction,
@@ -188,13 +193,21 @@ async function displayGestureInstructions(
     return result == "next";
 }
 
-async function performGesture(gesture: Gesture, gestureLocator: GestureLocator) {
+async function performGesture(
+    gesture: Gesture, 
+    gestureLocator: GestureLocator,
+    demonstration: GestureDemonstration) {
+    
     const durationS = gesture.duration;
     const durationMs = durationS * 1000 * 1.03;
 
+    demonstration.startPlaybackLoop();
+
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
-        createProgressBar("progess", durationS).completion,
+        createProgressBar("progress", durationS).completion,
         displayString(`Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
     ]);
+    
+    demonstration.stopPlayback();
 }
