@@ -203,18 +203,26 @@ async function performGesture(
     const durationS = gesture.duration;
     const durationMs = durationS * 1000 * 1.03;
 
-    // Add a flag for showing demonstration playback
+    // Flag for showing demonstration playback
     const showDemo = true;
 
     if (showDemo) {
         demonstration.startPlaybackLoop();
     }
 
+    const recordingTextArray = displayStringIndefinitely(
+        `${trialInstructions}\n\nRecording ${gesture.gesture_name} for ${Math.floor(gesture.duration)}s`,
+        scene
+    );
+
+    recordingTextArray.forEach((obj: any) => obj.position.y = 3.5);
+
     await Promise.all([
         startAndStreamHandDataToMain(durationMs, gestureLocator),
-        createProgressBar("progress", durationS).completion,
-        displayString(`${trialInstructions}\n Recording ${gesture.gesture_name} for ${gesture.duration} seconds`, durationMs, scene)
+        createProgressBar("progress", durationS).completion
     ]);
+    
+    clearDisplayIndefinitely(recordingTextArray, scene);
     
     if (showDemo) {
         demonstration.stopPlayback();

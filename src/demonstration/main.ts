@@ -50,17 +50,23 @@ async function initDemonstration(): Promise<any> {
 async function startDemonstrationRecording(shortCode: string, demonstration: GestureDemonstration, name: string, durationMs: number, locator: GestureClassLocator) {
     await startDemonstrationTransfer(shortCode);
 
+    const durationS = durationMs / 1000;
+
     await displaySkipableInstruction(
-        `Record gesture ${name ?? "unknown"} for ${durationMs / 1000}s`,
+        `Record gesture ${name ?? "unknown"} for ${Math.floor(durationS)}s`,
         "Place your whole hands in the box",
         "Remove your hands to start recording").completion;
 
-    await Promise.all([
-        streamHandDataDemonstration(durationMs, shortCode),
-        displayString(`recording gesture demonstration for ${durationMs / 1000}s`,
-            durationMs,
-            scene)
-    ]);
+    const staticTextArray = displayStringIndefinitely(
+        `Recording gesture demonstration for ${Math.floor(durationS)}s`,
+        scene
+    );
+
+    staticTextArray.forEach((obj: any) => obj.position.y = 3.5);
+
+    await streamHandDataDemonstration(durationMs, shortCode);
+
+    clearDisplayIndefinitely(staticTextArray, scene);
 
     const string = displayStringIndefinitely(
         `This is the gesture you recorded for ${name ?? "unknown"}`, scene);
