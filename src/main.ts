@@ -1,6 +1,6 @@
 import { VRButton } from "three/examples/jsm/webxr/VRButton";
 import { getNextTrial } from "./http_handler";
-import { initScene, animate, renderer, scene, initHands, updateBackendUrl } from "./init";
+import { initScene, animate, renderer, initHands, updateBackendUrl } from "./init";
 import { performTrial } from "./trial_manager";
 import { test } from "./test";
 

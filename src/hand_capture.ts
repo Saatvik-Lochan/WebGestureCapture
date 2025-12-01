@@ -1,5 +1,5 @@
 import { Clock, XRHandSpace, WebGLRenderer, Vector3, Quaternion, Object3D, Matrix4 } from "three";
-import { camera, frameListener, frameListeners, hands, renderer } from "./init";
+import { frameListener, frameListeners, hands, renderer } from "./init";
 import { sendDemonstrationBatch, sendHandGestureBatch, startHandGestureTransfer } from "./http_handler";
 
 /**
