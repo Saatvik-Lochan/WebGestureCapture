@@ -48,7 +48,7 @@ async function initViewer() {
     controls.minDistance = 0;
     controls.maxDistance = 1;
     
-    camera.position.set(0, 5, 0);
+    camera.position.set(0, 2, 0);
     controls.update();
 }
 
