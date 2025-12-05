@@ -36,7 +36,10 @@ async function initViewer() {
 
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const controls = new OrbitControls( camera, renderer.domElement );
+    camera.fov = 80;
+    camera.updateProjectionMatrix();
+
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.target = findCentre(Object.values(demonstration.hands));
     console.log(controls.target);
 
@@ -48,7 +51,7 @@ async function initViewer() {
     controls.minDistance = 0;
     controls.maxDistance = 1;
     
-    camera.position.set(0, 2, 0);
+    camera.position.set(0, 1.8, 0);
     controls.update();
 }
 
